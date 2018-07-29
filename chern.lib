@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////
-version = "version chern.lib 0.61 Dec_2015";      //$Id:$
+version = "version chern.lib 0.615 Feb_2015";      //$Id:$
 category = "Chern classes";
 info="
 LIBRARY:  chern.lib    Symbolic Computations with Chern classes
@@ -656,6 +656,13 @@ NOTE:     uses the elimination and is extremely inefficient,
           is included just for comparison with chAll(c)
 "
 {
+  int i;
+  // insure that the entries of c are polynomials
+  // in order to be able to apply maps
+  for(i=1;i<=size(c);i++)
+  {
+    c[i]=poly(c[i]);
+  }
   int n=size(c);
   if(n==0) // in this case return the empty list
   {
@@ -664,15 +671,14 @@ NOTE:     uses the elimination and is extremely inefficient,
   else // otherwise proceed as follows
   {
     def br@=basering; // remember the base ring
-    // add additional variables a@(1..n) to the base ring
-    execute("ring r@= (" + charstr(basering) + "),("+varstr(basering)+", c@, a@(1..n)), ls;" );
+    // add additional variables c@, a@(1..n) to the base ring
+    execute("ring r@= (" + charstr(basering) + "),(c@,"+varstr(basering)+", a@(1..n)), dp;" );
     execute( "map F= br@,"+varstr(br@)+";" ); // define the corresponding inclusion of rings
     list c=F(c); // embedd c in the bigger ring
     poly rez;
     list A=a@(1..n);
     list sym=symm(A);
     ideal I;
-    int i;
     poly E=1; // to be the product of variables which should be eliminated
     for(i=1;i<=n;i++)
     {
@@ -683,7 +689,7 @@ NOTE:     uses the elimination and is extremely inefficient,
     I=elim(I, E);
     rez = -subst(I[1], c@, 0);
     setring br@; // come back to the initial base ring
-    execute( "map FF= r@,"+varstr(br@)+",0 ;" ); // define the specialization homomorphism t@=0
+    execute( "map FF= r@,0,"+varstr(br@)+";" ); // define the specialization homomorphism
     poly rez=FF(rez); // bring the result to the base ring
     return( (1/factorial(n))*rez);
   }
@@ -975,6 +981,17 @@ NOTE:     makes sense only for (lists of) polynomials;
 {
   int r=size(c);
   int R=size(C);
+  // insure that the entries of c and C are polynomials
+  // in order to be able to apply maps
+  int i,j;
+  for(i=1;i<=r;i++)
+  {
+    c[i]=poly(c[i]);
+  }
+  for(i=1;i<=R;i++)
+  {
+    C[i]=poly(C[i]);
+  }
   if( (r==0) && (R==0) ) // if one of the ranks is 0,
   {
     return( list() ); // return the empty list (zero bundles have no Chern classes)
@@ -985,7 +1002,7 @@ NOTE:     makes sense only for (lists of) polynomials;
   int n=r*R; // the rank of the product of two vector bundles
   def br@=basering; // remember the base ring
   // add additional variables a@(1..r), b@(1..R), x@ to the base ring
-  execute("ring r@=("+ charstr(basering) +"),("+varstr(basering)+",a@(1..r),b@(1..R),x@ ), ls;");
+  execute("ring r@=("+ charstr(basering) +"),(x@,"+varstr(basering)+",a@(1..r),b@(1..R)), dp;");
   execute( "map F= br@,"+varstr(br@)+";" ); // define the corresponding inclusion of rings
   list c=F(c); // embedd c in the bigger ring
   list C=F(C); // embedd C in the bigger ring
@@ -994,7 +1011,6 @@ NOTE:     makes sense only for (lists of) polynomials;
   list B=b@(1..R); // list of Chern roots of the second vector bundle
   list symb=symm(B); // symmetric functions in the Chern roots of the second vector bundles
   ideal I;
-  int i, j;
   // the product of variables (all Chern roots) which should be eliminated
   poly E=product(A)*product(B);
   for(i=1; i<=r; i++)
@@ -1018,7 +1034,7 @@ NOTE:     makes sense only for (lists of) polynomials;
     rez = rez + list( -subst(J[1], x@, 0) );
   }
   setring br@; // come back to the initial base ring
-  execute( "map FF= r@,"+varstr(br@)+";" ); // define the specialization homomorphism t@=0
+  execute( "map FF= r@, 0,"+varstr(br@)+";" ); // define the specialization homomorphism t@=0
   list rez=FF(rez); // bring the result to the base ring
   return(rez); // return the corresponding Chern classes
 }
@@ -1487,6 +1503,13 @@ EXAMPLE:  example chSymm; shows an example
 NOTE:     for the second symmetric power chSymm2L(...) could be faster
 "
 {
+  // insure that the entries of c are polynomials
+  // in order to be able to apply maps
+  int i;
+  for(i=1;i<=size(c);i++)
+  {
+    c[i]=poly(c[i]);
+  }
   if(r<0) // if the rank is negative
   {
     print("The rank of a vector bundle can non be negative");
@@ -1499,7 +1522,6 @@ NOTE:     for the second symmetric power chSymm2L(...) could be faster
   //-----------------------------------
   // from now on we are in the case r>0
   //-----------------------------------
-  int i;
   // if the length  n of the list of Chern classes is smaller
   // than the rank of the vector bundle,
   // the higher classes are assumed to be zero and the list is appended by zeroes up to length r
@@ -1533,7 +1555,7 @@ NOTE:     for the second symmetric power chSymm2L(...) could be faster
   //-------------------------------
   def br@=basering; // remember the base ring
   // add additional variables to the base ring
-  execute("ring r@=(" + charstr(basering) +  "),("+varstr(basering)+", x@, a@(1..r)), ls;" );
+  execute("ring r@=(" + charstr(basering) +  "),(x@,"+varstr(basering)+", a@(1..r)), dp;" );
   execute( "map F= br@,"+varstr(br@)+";" ); // define the corresponding inclusion of rings
   list c=F(c); // embed c into the bigger ring
   list rez; // the Chern classes of the symmetric power are going to be written here
@@ -1610,7 +1632,7 @@ NOTE:     for the second symmetric power chSymm2L(...) could be faster
   setring br@; // come back to the initial base ring
   // define the specialization homomorphism,
   // evaluate the formulas for the Chern classes on their given values
-  execute( "map FF = r@,"+varstr(br@)+";" );
+  execute( "map FF = r@,0,"+varstr(br@)+";" );
   list rez=FF( rez ); // bring the result back to the initial ring
   return( list( N, rez  ) ); // return the result together with the rank of the symmetric power
 }
@@ -1636,6 +1658,13 @@ NOTE:     Implementation of the formula of Lascoux, the Schur polynomials are co
           using the second Jacobi-Trudi formula (in terms of the Chern classes)
 "
 {
+  // insure that the entries of c are polynomials
+  // in order to be able to apply maps
+  int i;
+  for(i=1;i<=size(c);i++)
+  {
+    c[i]=poly(c[i]);
+  }
   if(r<0) // if the rank is negative
   {
     print("The rank of a vector bundle can non be negative");
@@ -1655,7 +1684,6 @@ NOTE:     Implementation of the formula of Lascoux, the Schur polynomials are co
   execute("ring r@=(" + charstr(basering) +  "), ("+varstr(basering)+", t@, c@(1..r)), dp;" );
   execute( "map F= br@,"+varstr(br@)+";" ); // define the corresponding inclusion of rings
   list c;
-  int i;
   for(i=1;i<=r;i++)
   {
     c[i]=c@(i)*t@^i;
@@ -1752,6 +1780,13 @@ EXAMPLE:  example chWedge; shows an example
 NOTE:     for the second exterior power chWedge2L(...) could be faster
 "
 {
+  // insure that the entries of c are polynomials
+  // in order to be able to apply maps
+  int i;
+  for(i=1;i<=size(c);i++)
+  {
+    c[i]=poly(c[i]);
+  }
   if(r<0) // if the rank is negative
   {
     print("The rank of a vector bundle can non be negative");
@@ -1782,7 +1817,6 @@ NOTE:     for the second exterior power chWedge2L(...) could be faster
   //---------------------------------------
   // from now on we are in the case k > 2
   //---------------------------------------
-  int i;
   // if the length of the list of Chern classes is smaller than the rank of the vector bundle,
   // the higher classes are assumed to be zero and the list is appended by zeroes up to length r
   c=append_by_zeroes(r, c);
@@ -1813,7 +1847,7 @@ NOTE:     for the second exterior power chWedge2L(...) could be faster
   //-----------------------------
   def br@=basering; // remember the base ring
   // add additional variables a@(1..r), x@ to the base ring
-  execute("ring r@= (" + charstr(basering) + "), ("+varstr(basering)+", x@, a@(1..r)), ls;" );
+  execute("ring r@= (" + charstr(basering) + "), (x@,"+varstr(basering)+", a@(1..r)), lp;" );
   execute( "map F= br@,"+varstr(br@)+";" ); // define the corresponding inclusion of rings
   list c = F(c); // embed c into the bigger ring
   list rez; // the result should be computed here
@@ -1892,7 +1926,7 @@ NOTE:     for the second exterior power chWedge2L(...) could be faster
   setring br@; // come back to the initial base ring
   // define the specialization homomorphism,
   // evaluate the formulas for the Chern classes on their given values
-  execute( "map FF = r@,"+varstr(br@)+";" );
+  execute( "map FF = r@,0,"+varstr(br@)+";" );
   list rez=FF( rez ); // bring the result back to the initial ring
   return( list( N, rez  ) ); //return the rank and the Chern classes of the exterior product
 }
@@ -1918,6 +1952,13 @@ NOTE:     Implementation of the formula of Lascoux, the Schur polynomials are co
           using the second Jacobi-Trudi formula (in terms of the Chern classes)
 "
 {
+  // insure that the entries of c are polynomials
+  // in order to be able to apply maps
+  int i;
+  for(i=1;i<=size(c);i++)
+  {
+    c[i]=poly(c[i]);
+  }
   if(r<0) // if the rank is negative
   {
     print("The rank of a vector bundle can non be negative");
@@ -1937,7 +1978,6 @@ NOTE:     Implementation of the formula of Lascoux, the Schur polynomials are co
   execute("ring r@=(" + charstr(basering) +  "), ("+varstr(basering)+", t@, c@(1..r)), dp;" );
   execute( "map F= br@,"+varstr(br@)+";" ); // define the corresponding inclusion of rings
   list c;
-  int i;
   for(i=1;i<=r;i++)
   {
     c[i]=c@(i)*t@^i;
@@ -2025,6 +2065,13 @@ EXAMPLE:  example todd; shows an example
 NOTE:     returns an empty list if l is empty
 "
 {
+  int i, j, k;
+  // insure that the entries of c are polynomials
+  // in order to be able to apply maps
+  for(i=1;i<=size(c); i++)
+  {
+    c[i]=poly(c[i]);
+  }
   int n;
   # = integer_list(#)[1]; // take into account only the first integer entries that are positive
   if( size(#) == 0 ) // if there are no  optional parameters
@@ -2057,7 +2104,6 @@ NOTE:     returns an empty list if l is empty
     list next;
     next=tdTerms(n, c@(1)); // the Todd class terms of a line budle
     list step = tdTerms(n, a@);
-    int i, j, k;
     poly f;
     list hC=c@(1)-a@; // "old" first Chern class
     for(k=2;k<=n;k++) // do n-1 iterations
@@ -2119,6 +2165,11 @@ NOTE:     returns an empty list if l is empty,
           very inefficient because the elimination is used, included for comparison with todd(c)
 "
 {
+  int i;
+  for(i=1;i<=size(c);i++)
+  {
+    c[i]=poly( c[i] );
+  }
   int n=size(c);
   if(n==0) // return the empty list if c is empty
   {
@@ -2128,10 +2179,9 @@ NOTE:     returns an empty list if l is empty,
   {
     def br@=basering; // remember the base ring
     // add additional variables a@(1..n), x@ to the base ring
-    execute("ring r@=(" + charstr(basering) + "), ("+varstr(basering)+", a@(1..n), x@), ls;" );
+    execute("ring r@=(" + charstr(basering) + "), (x@,"+varstr(basering)+", a@(1..n)), dp;" );
     execute( "map F= br@,"+varstr(br@)+";" ); // define the corresponding inclusion of rings
     list c=F(c); // embed c into the bigger ring
-    int i;
     int j;
     int k;
     poly E = a@(1); // to be the product of the Chern roots that will be eliminated later
@@ -2159,7 +2209,7 @@ NOTE:     returns an empty list if l is empty,
     poly rez=-subst(I[1],x@, 0); // get the required formula
     setring br@; // come back to the initial base ring
     // define the specialization homomorphism (all added variables are set to zero)
-    execute( "map FF = r@,"+varstr(br@)+";" );
+    execute( "map FF = r@,0, "+varstr(br@)+";" );
     poly rez=FF( rez ); // bring the result back to the initial base ring
     return(rez);
   }
@@ -2441,10 +2491,15 @@ NOTE:
   }
   else
   {
-    int sz=size(c);
+    if(n==0)
+    {
+      return(r);
+    }
+    // now n is at least 1
+    c=append_by_zeroes(n, c); // append c by zeroes if its size is smaller than n
+    c=c[1..n]; // throw away the redundant data
+    // now the size of c is n
     list td = tdProj(n); // terms of the Todd class of P_n
-    int N = min( n, sz );
-    int i;
     list ch = list(r) + chAll(c); // terms of the Chern character of the vector bundle
     return( rHRR(n, ch, td) );
   }
@@ -3349,12 +3404,16 @@ NOTE:
   list P = LRmul(dualPart(L), M);
   int  sz=size(P);
   poly rez;
+  //poly h;
   list T, DT;
+  //bigint lrc;
   int i;
   for(i=1;i<=sz;i++)
   {
     T=P[i][2];
     DT=dualPart(T);
+    //lrc=P[i][1];
+    //h=contentPolyM(DT, L, e)*contentPoly(T, M, f);
     rez=rez+P[i][1]* contentPoly(DT, L, e)*contentPoly(T, M, f)/hook(DT);
   }
  return(rez);
