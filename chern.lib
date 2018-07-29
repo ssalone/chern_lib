@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////
-version = "version chern.lib 0.6 Oct_2015";      //$Id:$
+version = "version chern.lib 0.61 Dec_2015";      //$Id:$
 category = "Chern classes";
 info="
 LIBRARY:  chern.lib    Symbolic Computations with Chern classes
@@ -7,11 +7,12 @@ LIBRARY:  chern.lib    Symbolic Computations with Chern classes
 AUTHOR:  Oleksandr Iena,      oleksandr.iena@uni.lu,  yena@mathematik.uni-kl.de
 
 REFERENCES:
-  [1] Iena, Oleksandr, On symbolic computations with Chern classes:
-                       remarks on the library chern.lib for Singular,
-                       http://hdl.handle.net/10993/22395, 2015
-  [2] Lascoux, Alain,  Classes de Chern d'un produit tensoriel.
-                       C. R. Acad. Sci., Paris, Ser. A 286, 385-387 (1978).
+  [1] Iena, Oleksandr,  On symbolic computations with Chern classes:
+                        remarks on the library chern.lib for Singular,
+                        http://hdl.handle.net/10993/22395, 2015.
+  [2] Lascoux, Alain,   Classes de Chern d'un produit tensoriel.
+                        C. R. Acad. Sci., Paris, Ser. A 286, 385-387 (1978).
+  [3] Manivel, Laurent  Chern classes of tensor products, arXiv 1012.0014, 2010.
 
 PROCEDURES:
   symm(l [,N]);             symmetric functions in the entries of l
@@ -36,6 +37,8 @@ PROCEDURES:
   chProdE(c, C);            Chern classes of a tensor product of vector bundles
   chProdL(r, c, R, C);      Chern classes of a tensor product of vector bundles
   chProdLP(r, c, R, C);     total Chern class of a tensor product of vector bundles
+  chProdM(r, c, R, C);      Chern classes of a tensor product of vector bundles
+  chProdMP(r, c, R, C);     total Chern class of a tensor product of vector bundles
   ChernRootsHom(l, L);      the Chern roots of a Hom vector bundle
   chHom(r, c, R, C [,N]);   Chern classes of the Hom-vector bundle
   ChernRootsSymm(n, l);     the Chern roots of the n-th symmetric power
@@ -94,6 +97,7 @@ PROCEDURES:
 ";
 
 LIB "general.lib";
+LIB "lrcalc.lib"; // needed for chProdM(..) and chProdMP(..)
 //----------------------------------------------------------
 
 proc symm(list l, list #)
@@ -342,7 +346,7 @@ example
 //-----------------------------------------------------------------------
 
 proc chNum(int N, list c)
-"USAGE:   chNun(N, c);  N integer, c list
+"USAGE:   chNum(N, c);  N integer, c list
 RETURN:   list
 PURPOSE:  computes the Chern numbers of a vector bundle with Chern classes c
           on a complex manifold (variety) of dimension N,
@@ -407,7 +411,7 @@ RETURN:   list
 PURPOSE:  computes the Chern numbers of a vector bundle with Chern classes c
           on a complex manifold (variety) of dimension r
 EXAMPLE:  example chNumbers; shows an example
-NOTE:     computes basically the patitions of r
+NOTE:     computes basically the partitions of r
 "
 {
   if(r<0)
@@ -1163,6 +1167,141 @@ example
   list c=c(1..3);
   list C=C(1);
   print( chProdLP(3,c,1,C) );
+}
+//---------------------------------------------------------------------------------------
+
+proc chProdM(int r, list c, int R, list C)
+"USAGE:   chProdM(r, c, R, C);  r, R integers; c, C lists of polynomials
+RETURN:   list
+PURPOSE:  computes the list of Chern classes of the product of two vector bundles
+          in terms of their Chern clases
+EXAMPLE:  example chProdM; shows an example
+NOTE:     Implementation of the formula of Manivel
+"
+{
+  // check the input data
+  if(r<=0) // if r is negative or zero return the empty list
+  {
+    return( list() );
+  }
+  //----------------------------
+  //now r is a positive integer
+  //----------------------------
+  c=append_by_zeroes(r, c); // append c by zeroes if r is greater than the length of c
+  c=c[1..r]; // make c shorter (of length r) if r is smaller than the length of c
+  if(R<=0) // if R is negative or zero return the empty list
+  {
+    return( list() );
+  }
+  //----------------------------
+  //now R is a positive integer
+  //----------------------------
+  C=append_by_zeroes(R, C); // append C by zeroes if R is greater than the length of C
+  C=C[1..R]; // make C shorter (of length R) if R is smaller than the length of C
+  //----------------------------------------------------------
+  // now r > 0 and R > 0
+  //----------------------------------------------------------
+  def br@=basering; // remember the base ring
+  // add  additional variables to the base ring
+  execute("ring r@=("+charstr(basering)+"), ("+varstr(basering)+", t@, c@(1..r), C@(1..R)), dp;");
+  execute( "map F= br@,"+varstr(br@)+";" ); // define the corresponding inclusion of rings
+  list c, C;
+  int i;
+  for(i=1;i<=r;i++)
+  {
+    c[i]=c@(i)*t@^i;
+  }
+  for(i=1;i<=R;i++)
+  {
+    C[i]=C@(i)*t@^i;
+  }
+  poly f = chProdMP(r,c,R,C); // get the total Chern class using the Manivel formula
+  matrix CF = coeffs(f, t@); // get its coefficients in front of the powers of t@
+  int N=r*R;
+  list rez; // write them in a list
+  for(i=1;i<=N;i++)
+  {
+    rez=rez+list(CF[i+1,1]);
+  }
+  setring br@; // come back to the initial base ring
+  // define the specialization homomorphism
+  execute("map FF = r@,"+varstr(br@)+",0, c[1..r], C[1..R];");
+  return( FF( rez ) ); // bring the result to the initial ring
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  // The Chern classes of the tensor product of a vector bundle of rank 3
+  // with Chern classes c(1), c(2), c(3) and a vector bundle of rank 1 with
+  // Chern class C(1)
+  ring r = 0, ( c(1..3), C(1)), dp;
+  list c=c(1..3);
+  list C=C(1);
+  print( chProdM(3,c,1,C) );
+}
+//---------------------------------------------------------------------------------------
+
+proc chProdMP(int r, list c, int R, list C)
+"USAGE:   chProdMP(r, c, R, C);  r, R integers; c, C lists of polynomials
+RETURN:   polynomial
+PURPOSE:  computes the total Chern class of the product of two vector bundles
+          in terms of their ranks and Chern clases
+EXAMPLE:  example chProdMP; shows an example
+NOTE:     Implementation of the formula of Lascoux, the Schur polynomials are computed
+          using the second Jacobi-Trudi formula (in terms of the Chern classes)
+"
+{
+  if(r<=0) // if r is negative or zero, return 1
+  {
+    return( 1 );
+  }
+  if(R<=0) // if R is negative or zero, return 1
+  {
+    return( 1 );
+  }
+  //-------------------------------------------
+  // now r and R are positive
+  //-------------------------------------------
+  c=append_by_zeroes(r, c);
+  C=append_by_zeroes(R, C);
+  c=c[1..r];
+  C=C[1..R];
+  list P;
+  P=part(r, R); // compute the partitions of numbers up to R into r summands
+  int sz=size(P); // number of such partitions
+  int szu;
+  int i, j;
+  list T;
+  list PU;
+  list TU;
+  poly rez; // the result will be computed here
+  poly ST;
+  // implement the formula of Manivel:
+  for(i=1;i<=sz;i++) // run through all the partitions from P
+  {
+    T=P[i]; // the current partition
+    ST= SchurS( PartC(T, R) , C ); // compute the corresponding Schur polynomial
+    PU=partUnder(T); // compute the partitions under T
+    szu=size(PU); // number of such partitions
+    for(j=1;j<=szu;j++) // run through all the partitions lying under T
+    {
+      TU=PU[j]; // for each of them
+      // add the corresponding term to the result
+      rez=rez+Pcoef( TU, PartC(dualPart(T, R), r), r, R )* SchurCh(TU, c) *ST;
+    }
+  }
+  return(rez); // return the result
+}
+example
+{
+  "EXAMPLE:"; echo =2;
+  // The total Chern class of the tensor product of a vector bundle of rank 3
+  // with Chern classes c(1), c(2), c(3) and a vector bundle of rank 1 with
+  // Chern class C(1)
+  ring r = 0, ( c(1..3), C(1)), ws(1,2,3, 1);
+  list c=c(1..3);
+  list C=C(1);
+  print( chProdMP(3,c,1,C) );
 }
 //---------------------------------------------------------------------------------------
 
@@ -3042,3 +3181,193 @@ example
   print( IJcoef(I, J) );
 }
 //---------------------------------------------------------------------------------------
+
+static proc invertPart(list l)
+"USAGE:   invertPart(I);  I list of integers (partition),
+RETURN:   list of integers
+PURPOSE:  inverts the ordering of the elements in the list
+EXAMPLE:  example invertPart; shows an example
+NOTE:
+"
+{
+  list L;
+  int sz=size(l);
+  int i;
+  for(i=sz;i>=1;i--)
+  {
+    L=L+list(l[i]);
+  }
+  return(L);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  // Invert the ordering of elements in (3, 2, 1)
+  list l = 3, 2, 1;
+  print( invertPart(l) );
+}
+//---------------------------------------------------------------------------------------
+
+static proc LRmul(list I, list J)
+"USAGE:   LRmul(x, y);  x, y lists of integers (partitions)
+RETURN:   list of lists
+PURPOSE:  computes the partitions z for which the Littlewood-Richardson
+          coefficient c^z_{x,y} is non-zero together with that coefficient;
+          partitions up to length r
+EXAMPLE:  example LRmul; shows an example
+NOTE:     uses LRmult(..) from lrcalc.lib, does the same,
+          only uses the inverted ordering of the elements in the partition
+"
+{
+  list rez=LRmult(invertPart(I), invertPart(J));
+  int sz=size(rez);
+  int i;
+  for(i=1;i<=sz;i++)
+  {
+    rez[i][2]=invertPart(rez[i][2]);
+  }
+  return(rez);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  // Compute the partitions z for which the Littlewood-Richardson coefficient
+  // c^z_{x,y} is non-zero together with that coefficient
+  // for x= (1, 2), y=(1, 2)
+  list x = 1, 2;
+  list y = 1, 2;
+  print( LRmul(x, y) );
+}
+//---------------------------------------------------------------------------------------
+
+static proc hook(list I)
+"USAGE:   hook(I);  I list of integers (partition),
+RETURN:   bigint
+PURPOSE:  computes the product of the hook lenhths of the partition I
+EXAMPLE:  example hook; shows an example
+NOTE:
+"
+{
+  bigint rez=1;
+  list dI= invertPart( dualPart(I) );
+  I=invertPart( I );
+  int szI=size(I);
+  int szdI=size(dI);
+  int i, j;
+  for(i=1;i<=szI;i++)
+  {
+    for(j=1;j<=I[i];j++)
+    {
+      rez=rez*(I[i]+dI[j]-i-j+1);
+    }
+  }
+  return(rez);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  // compute the product of all hook lengths of the partition (1, 1, 3)
+  list I = 1, 1, 3;
+  print( hook(I) );
+}
+//---------------------------------------------------------------------------------------
+
+static proc apn0_int(int N, list c)
+"USAGE:   apn0_int( N, c);  N integer, c list of integers (partition)
+RETURN:   list of integers
+PURPOSE:  appends by integer zeroes up to the length N
+EXAMPLE:  example apn0_int; shows an example
+NOTE:
+"
+{
+  int n=size(c);
+  if(N>n) // if N is greater than the length of c, append c by zeroes up to the length N
+  {
+    int i;
+    for(i=n+1;i<=N;i++)
+    {
+      c=c+list( int(0) );
+    }
+  }
+  return(c);
+}
+example
+{
+  "EXAMPLE:";echo =2;
+  ring r = 0, (x, y, z), dp;
+  list l=(1, 2, 3);
+  //append the list by two zeroes and get a list of lenght 5
+  print( apn0_int(5, l) );
+}
+//---------------------------------------------------------------------------------------
+
+static proc contentPoly(list I, list J, poly e)
+"USAGE:   contentPoly(I, J, e);  L, M lists of integers (partitions),
+          e polynomial
+RETURN:   poly
+PURPOSE:  computes the content polynomial of the skew partition corresponding to I>J
+EXAMPLE:  example contentPoly; shows an example
+NOTE:
+"
+{
+  int i, j;
+  int szI=size(I);
+  I=invertPart(I);
+  J=invertPart(J);
+  J=apn0_int(szI, J);
+  poly rez=1;
+  for(i=1; i<=szI; i++)
+  {
+    for(j=J[i]+1; j<=I[i]; j++)
+    {
+      rez = rez*(e- i+j);
+    }
+  }
+  return(rez);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  // compute the content Polynomial of the skew partition
+  // corresponding to  (1,2) > (0, 1) with respect to the variable x
+  ring r = 0, (x), dp;
+  list L=1,2;
+  list M=0,1;
+  print( contentPoly(L, M, x) );
+}
+//---------------------------------------------------------------------------------------
+
+static proc Pcoef(list L, list M, poly e, poly f)
+"USAGE:   Pcoef(L, M, e, f);  L, M lists of integers (partitions),
+          e, f polynomials
+RETURN:   poly
+PURPOSE:  computes the polynomial P_{L, M}(e, f) from the paper of Manivel
+EXAMPLE:  example Pcoef; shows an example
+NOTE:
+"
+{
+  list P = LRmul(dualPart(L), M);
+  int  sz=size(P);
+  poly rez;
+  list T, DT;
+  int i;
+  for(i=1;i<=sz;i++)
+  {
+    T=P[i][2];
+    DT=dualPart(T);
+    rez=rez+P[i][1]* contentPoly(DT, L, e)*contentPoly(T, M, f)/hook(DT);
+  }
+ return(rez);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  // compute P_{L, M}(e, f) from the paper of Manivel
+  // for L = (0,1) and M = (1, 1)
+  ring r = 0, (e, f), dp;
+  list L=1,2,3;
+  list M=1,2;
+  print( Pcoef(L, M, e, f) );
+}
+//---------------------------------------------------------------------------------------
+
