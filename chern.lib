@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////
-version = "version chern.lib 0.706 Jun_2018 ";      //$Id$
+version = "version chern.lib 0.7061 Jun_2018 ";      //$Id$
 category = "Chern classes";
 info="
 LIBRARY:  chern.lib    Symbolic Computations with Chern classes,
@@ -2393,10 +2393,11 @@ example
   // the coefficients of the total Chern class of the complex projective line
   print( cProj(1) );
 
-  // the coefficients of the total Chern class of the complex projective line
+  // the coefficients of the total Chern class of the complex projective plane
   print( cProj(2) );
 
-  // the coefficients of the total Chern class of the complex projective line
+  // the coefficients of the total Chern class of the complex projective space
+  // of dimension three
   print( cProj(3) );
 }
 //------------------------------------------------------------------------------------------
