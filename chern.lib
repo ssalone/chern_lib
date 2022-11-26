@@ -214,16 +214,18 @@ NOTE:     constants are considered symmetric
   poly monc; // the corresponding expression in A@(i)
   list l=symm(list(A@(1..nV) )); // symmetric functions in A@(i)
   intvec v=leadexp(f), 0; // the exponent of the leading monomial
+  int exponent;
   while(v[N1]!=0)
   {
     mon=leadcoef(f); // leading coefficient of f
     monc=mon;
     for(i=1; i<=nV && mon !=0 ;i++ )
     {
-      if( v[N1+i-1]-v[N1+i] >=0 )
+      exponent = v[N1+i-1]-v[N1+i];
+      if( exponent >=0 )
       {
-        mon = mon*c@(i)^( v[N1+i-1]-v[N1+i] );
-        monc = monc*l[i]^( v[N1+i-1]-v[N1+i] ); // has the same leading coefficient as f
+        mon = mon*c@(i)^exponent;
+        monc = monc*l[i]^exponent; // has the same leading coefficient as f
       }
       else
       {
