@@ -1,0 +1,1246 @@
+                     SINGULAR                                 /  Development
+ A Computer Algebra System for Polynomial Computations       /   version 4.3.1
+                                                           0<
+ by: W. Decker, G.-M. Greuel, G. Pfister, H. Schoenemann     \   Jun 2022
+FB Mathematik der Universitaet, D-67653 Kaiserslautern        \
+./tests_chern.sng   1>     LIB "chern.lib";
+// ** loaded chern.lib (0.8,Nov_2022)
+// ** loaded /home/ssalone/Singular4/bin/../share/singular/LIB/lrcalc.lib (4.1.2.0,Feb_2019)
+// ** loaded /home/ssalone/Singular4/bin/../share/singular/LIB/general.lib (4.1.2.0,Feb_2019)
+// ** loaded /home/ssalone/Singular4/bin/../share/singular/LIB/ring.lib (4.1.2.0,Feb_2019)
+// ** loaded /home/ssalone/Singular4/bin/../share/singular/LIB/primdec.lib (4.2.1.1,Jul_2021)
+// ** loaded /home/ssalone/Singular4/bin/../share/singular/LIB/absfact.lib (4.1.2.0,Feb_2019)
+// ** loaded /home/ssalone/Singular4/bin/../share/singular/LIB/triang.lib (4.1.2.0,Feb_2019)
+// ** loaded /home/ssalone/Singular4/bin/../share/singular/LIB/random.lib (4.1.2.0,Feb_2019)
+// ** loaded /home/ssalone/Singular4/bin/../share/singular/LIB/elim.lib (4.1.2.0,Feb_2019)
+// ** loaded /home/ssalone/Singular4/bin/../share/singular/LIB/matrix.lib (4.1.2.0,Feb_2019)
+// ** loaded /home/ssalone/Singular4/bin/../share/singular/LIB/nctools.lib (4.1.2.0,Feb_2019)
+// ** loaded /home/ssalone/Singular4/bin/../share/singular/LIB/polylib.lib (4.2.0.0,Dec_2020)
+// ** loaded /home/ssalone/Singular4/bin/../share/singular/LIB/inout.lib (4.1.2.0,Feb_2019)
+./tests_chern.sng   2> LIB "lrcalc.lib";
+// ** redefining LRinstall (LIB "lrcalc.lib";) ./tests_chern.sng:2
+// ** redefining LRinstall (LIB "lrcalc.lib";) ./tests_chern.sng:2
+// ** redefining LRcoef (LIB "lrcalc.lib";) ./tests_chern.sng:2
+// ** redefining LRcoef (LIB "lrcalc.lib";) ./tests_chern.sng:2
+// ** redefining LRskew (LIB "lrcalc.lib";) ./tests_chern.sng:2
+// ** redefining LRskew (LIB "lrcalc.lib";) ./tests_chern.sng:2
+// ** redefining LRmult (LIB "lrcalc.lib";) ./tests_chern.sng:2
+// ** redefining LRmult (LIB "lrcalc.lib";) ./tests_chern.sng:2
+// ** redefining LRcoprod (LIB "lrcalc.lib";) ./tests_chern.sng:2
+// ** redefining LRcoprod (LIB "lrcalc.lib";) ./tests_chern.sng:2
+// ** redefining LRschubmult (LIB "lrcalc.lib";) ./tests_chern.sng:2
+// ** redefining LRschubmult (LIB "lrcalc.lib";) ./tests_chern.sng:2
+// ** redefining string2list (LIB "lrcalc.lib";) ./tests_chern.sng:2
+// ** redefining string2int (LIB "lrcalc.lib";) ./tests_chern.sng:2
+// ** loaded /home/ssalone/Singular4/bin/../share/singular/LIB/lrcalc.lib (4.1.2.0,Feb_2019)
+./tests_chern.sng   3> int REZ=1;
+./tests_chern.sng   4> proc fail(string s)
+./tests_chern.sng   5. {
+./tests_chern.sng   6.   return("Failed in "+s);
+./tests_chern.sng   8. }
+./tests_chern.sng   9> 
+./tests_chern.sng  10. proc check(string s)
+./tests_chern.sng  11. {
+./tests_chern.sng  12.   if(!REZ)
+./tests_chern.sng  14.   {
+./tests_chern.sng  16.     fail(s);
+./tests_chern.sng  18.     REZ=1;
+./tests_chern.sng  20.     return(0);
+./tests_chern.sng  22.   }
+./tests_chern.sng  24.   else
+./tests_chern.sng  26.   {
+./tests_chern.sng  28.     return(1);
+./tests_chern.sng  30.   }
+./tests_chern.sng  32. }
+./tests_chern.sng  33> 
+./tests_chern.sng  34. proc ensure(int b)
+./tests_chern.sng  35. {
+./tests_chern.sng  36.   if(b)
+./tests_chern.sng  38.   {
+./tests_chern.sng  40. //    return(1);
+./tests_chern.sng  42.   }
+./tests_chern.sng  44.   else
+./tests_chern.sng  46.   {
+./tests_chern.sng  48.     REZ=0;
+./tests_chern.sng  50. //    return(0);
+./tests_chern.sng  52.   }
+./tests_chern.sng  54. }
+./tests_chern.sng  55> 
+./tests_chern.sng  56. 
+./tests_chern.sng  57. proc test_symm()
+./tests_chern.sng  58. {
+./tests_chern.sng  59.   string s="symm()";
+./tests_chern.sng  61.   // elementary symmetric functions in x, y, z:
+./tests_chern.sng  63.   ring r = 0, (x, y, z), dp;
+./tests_chern.sng  65.   list l=(x, y, z);
+./tests_chern.sng  67.   list rez=symm(l);
+./tests_chern.sng  69.   ensure(rez[1] == x+y+z);
+./tests_chern.sng  71.   ensure(rez[2] ==  xy+xz+yz);
+./tests_chern.sng  73.   ensure(rez[3] ==  xyz);
+./tests_chern.sng  75. 
+./tests_chern.sng  77.   //now let us compute only the first two symmetric polynomials in a(1), ... , a(10)
+./tests_chern.sng  79.   ring q= 0,(a(1..10)), dp;
+./tests_chern.sng  81.   list l=a(1..10);
+./tests_chern.sng  83.   list rez=symm(l, 2);
+./tests_chern.sng  85. 
+./tests_chern.sng  87.   ensure(rez[1]== a(1)+a(2)+a(3)+a(4)+a(5)+a(6)+a(7)+a(8)+a(9)+a(10));
+./tests_chern.sng  89.   ensure(rez[2]== a(1)*a(2)+a(1)*a(3)+a(2)*a(3)+a(1)*a(4)+a(2)*a(4)+a(3)*a(4)+a(1)*a(5)+a(2)*a(5)+a(3)*a(5)+a(4)*a(5)+a(1)*a(6)+a(2)*a(6)+a(3)*a(6)+a(4)*a(6)+a(5)*a(6)+a(1)*a(7)+a(2)*a(7)+a(3)*a(7)+a(4)*a(7)+a(5)*a(7)+a(6)*a(7)+a(1)*a(8)+a(2)*a(8)+a(3)*a(8)+a(4)*a(8)+a(5)*a(8)+a(6)*a(8)+a(7)*a(8)+a(1)*a(9)+a(2)*a(9)+a(3)*a(9)+a(4)*a(9)+a(5)*a(9)+a(6)*a(9)+a(7)*a(9)+a(8)*a(9)+a(1)*a(10)+a(2)*a(10)+a(3)*a(10)+a(4)*a(10)+a(5)*a(10)+a(6)*a(10)+a(7)*a(10)+a(8)*a(10)+a(9)*a(10));
+./tests_chern.sng  91.   return(check(s));
+./tests_chern.sng  93. 
+./tests_chern.sng  95. }
+./tests_chern.sng  96> 
+./tests_chern.sng  97. proc test_symNsym()
+./tests_chern.sng  98. {
+./tests_chern.sng  99.   string s="symNsym()";
+./tests_chern.sng 101.   ring r=0, (x,y,z, c(1..3)), dp;
+./tests_chern.sng 103.   list l=c(1..3);
+./tests_chern.sng 105.   // The symmetric part of f = 3x2 + 3y2 + 3z2 + 7xyz + y
+./tests_chern.sng 107.   // in terms of the elemenatary symmetric functions c(1), c(2), c(3)
+./tests_chern.sng 109.   // and the remainder
+./tests_chern.sng 111.   poly f = 3x2 + 3y2 + 3z2 + 7xyz + y;
+./tests_chern.sng 113.   list rez= symNsym(f, l);
+./tests_chern.sng 115.   ensure(rez[1]== 3*c(1)^2-6*c(2)+7*c(3));
+./tests_chern.sng 117.   ensure(rez[2]==  y);
+./tests_chern.sng 119.   // Take a symmetrix polynomial in variables x and z
+./tests_chern.sng 121.   f=x2+xz+z2;
+./tests_chern.sng 123.   // Express it in terms of the elementary the symmetric functions
+./tests_chern.sng 125.   rez= symNsym(f, l);
+./tests_chern.sng 127.   ensure(rez[1]==c(1)^2-c(2));
+./tests_chern.sng 129.   ensure(rez[2]==0);
+./tests_chern.sng 131.   return(check(s));
+./tests_chern.sng 133. }
+./tests_chern.sng 134> 
+./tests_chern.sng 135. proc test_CompleteHomog()
+./tests_chern.sng 136. {
+./tests_chern.sng 137.   string s= "CompleteHomog()";
+./tests_chern.sng 139.   ring r = 0, (x(1..3)), dp;
+./tests_chern.sng 141.   list l=x(1..3);
+./tests_chern.sng 143.   //Complete homogeneous symmetric polynomials up to degree 3 in variables x(1), x(2), x(3)
+./tests_chern.sng 145.   list rez= CompleteHomog(3, l) ;
+./tests_chern.sng 147.   ensure(rez[1]==1);
+./tests_chern.sng 149.   ensure(rez[2]==x(1));
+./tests_chern.sng 151.   ensure(rez[3]== x(1)^2-x(2));
+./tests_chern.sng 153.   ensure(rez[4]== x(1)^3-2*x(1)*x(2)+x(3));
+./tests_chern.sng 155.   return(check(s));
+./tests_chern.sng 157. }
+./tests_chern.sng 158> 
+./tests_chern.sng 159. proc test_segre()
+./tests_chern.sng 160. {
+./tests_chern.sng 161.   string s="segre()";
+./tests_chern.sng 163.   ring r = 0, (c(1..3)), dp;
+./tests_chern.sng 165.   list l=c(1..3);
+./tests_chern.sng 167.   //Segre classes up to degree 5 in Chern classes c(1), c(2), c(3)
+./tests_chern.sng 169.   list rez= segre(l, 5);
+./tests_chern.sng 171.   ensure( rez[1] == -c(1));
+./tests_chern.sng 173.   ensure( rez[2] == c(1)^2-c(2));
+./tests_chern.sng 175.   ensure( rez[3] == -c(1)^3+2*c(1)*c(2)-c(3));
+./tests_chern.sng 177.   ensure( rez[4] ==  c(1)^4-3*c(1)^2*c(2)+c(2)^2+2*c(1)*c(3));
+./tests_chern.sng 179.   ensure(rez[5] == -c(1)^5+4*c(1)^3*c(2)-3*c(1)*c(2)^2-3*c(1)^2*c(3)+2*c(2)*c(3));
+./tests_chern.sng 181.   return(check(s));
+./tests_chern.sng 183. 
+./tests_chern.sng 185. }
+./tests_chern.sng 186> 
+./tests_chern.sng 187. 
+./tests_chern.sng 188. proc test_chern()
+./tests_chern.sng 189. {
+./tests_chern.sng 190.   string s="chern()";
+./tests_chern.sng 192.   ring r = 0, (s(1..3)), dp;
+./tests_chern.sng 194.   list l=s(1..3);
+./tests_chern.sng 196.   // Chern classes in Segre classes s(1), s(2), s(3)
+./tests_chern.sng 198.   list rez= chern(l);
+./tests_chern.sng 200.   ensure(rez[1]==   -s(1));
+./tests_chern.sng 202.   ensure(rez[2]==   s(1)^2-s(2));
+./tests_chern.sng 204.   ensure(rez[3]==  -s(1)^3+2*s(1)*s(2)-s(3));
+./tests_chern.sng 206.   // This procedure is inverse to segre(...). Indeed:
+./tests_chern.sng 208.   rez=segre(chern(l), 3) ;
+./tests_chern.sng 210.   ensure(rez[1]==  s(1));
+./tests_chern.sng 212.   ensure(rez[2]==   s(2));
+./tests_chern.sng 214.   ensure(rez[3]==   s(3));
+./tests_chern.sng 216.   return(check(s));
+./tests_chern.sng 218. 
+./tests_chern.sng 220. }
+./tests_chern.sng 221> proc test_chNum()
+./tests_chern.sng 222. {
+./tests_chern.sng 223.   string s="chNum()";
+./tests_chern.sng 225.   ring r = 0, (c(1..2)), dp;
+./tests_chern.sng 227.   list l=c(1..2);
+./tests_chern.sng 229.   // Let c(1) be a variable of degree 1, let c(2) be a variable of degree 2.
+./tests_chern.sng 231.   // The monomials in c(1) and c(2) of weighted degree 5 are:
+./tests_chern.sng 233.   list rez= chNum( 5, l ) ;
+./tests_chern.sng 235.   ensure(rez[1]==   c(1)^5);
+./tests_chern.sng 237.   ensure(rez[2]==   c(1)^3*c(2));
+./tests_chern.sng 239.   ensure(rez[3]==   c(1)*c(2)^2);
+./tests_chern.sng 241.   return(check(s));
+./tests_chern.sng 243. }
+./tests_chern.sng 244> 
+./tests_chern.sng 245. proc test_chNumbers()
+./tests_chern.sng 246. {
+./tests_chern.sng 247.   string s= "chNumbers()";
+./tests_chern.sng 249.   ring r = 0, (c(1..3)), dp;
+./tests_chern.sng 251.   list l=c(1..3);
+./tests_chern.sng 253.   // The Chern numbers of a vector bundle with Chern classes c(1), c(2), c(3)
+./tests_chern.sng 255.   // on a 3-fold:
+./tests_chern.sng 257.   list rez= chNumbers( 3, l );
+./tests_chern.sng 259.   ensure(rez[1] ==  c(1)^3);
+./tests_chern.sng 261.   ensure(rez[2]==    c(1)*c(2));
+./tests_chern.sng 263.   ensure(rez[3]==   c(3));
+./tests_chern.sng 265.   // If the highest Chern class is zero, the Chern numbers are:
+./tests_chern.sng 267.   l=c(1..2);
+./tests_chern.sng 269.   rez= chNumbers( 3, l );
+./tests_chern.sng 271.   ensure(rez[1]==   c(1)^3);
+./tests_chern.sng 273.   ensure(rez[2]== c(1)*c(2));
+./tests_chern.sng 275.   ensure(rez[3]==   0);
+./tests_chern.sng 277.   return(check(s));
+./tests_chern.sng 279. }
+./tests_chern.sng 280> 
+./tests_chern.sng 281. proc test_sum_of_powers()
+./tests_chern.sng 282. {
+./tests_chern.sng 283.   string s="sum_of_powers()";
+./tests_chern.sng 285.   ring r = 0, (x, y, z), dp;
+./tests_chern.sng 287.   list l=x, y, z;
+./tests_chern.sng 289.   //sum of 7-th powers of x, y, z
+./tests_chern.sng 291.   poly rez= sum_of_powers(7, l);
+./tests_chern.sng 293.   ensure( rez==x7+y7+z7 );
+./tests_chern.sng 295.   return(check(s));
+./tests_chern.sng 297. 
+./tests_chern.sng 299. }
+./tests_chern.sng 300> 
+./tests_chern.sng 301. proc test_powSumSym()
+./tests_chern.sng 302. {
+./tests_chern.sng 303.   string  s= "powSumSym()";
+./tests_chern.sng 305. 
+./tests_chern.sng 307.   // the expressions of the first 3 sums of powers of 3 variables a(1), a(2), a(3)
+./tests_chern.sng 309.   // in terms of the elementary symmetric polynomials c(1), c(2), c(3):
+./tests_chern.sng 311.   ring r = 0, (c(1..3)), dp;
+./tests_chern.sng 313.   list l=(c(1..3));
+./tests_chern.sng 315.   list rez=powSumSym(l);
+./tests_chern.sng 317.   ensure(rez[1]==  c(1) );
+./tests_chern.sng 319.   ensure(rez[2]==  c(1)^2-2*c(2)) ;
+./tests_chern.sng 321.   ensure(rez[3]==   c(1)^3-3*c(1)*c(2)+3*c(3));
+./tests_chern.sng 323.   
+./tests_chern.sng 325.   // The first 5 sums in the same situation
+./tests_chern.sng 327.   rez= powSumSym(l, 5);
+./tests_chern.sng 329.   ensure(rez[1]==   c(1));
+./tests_chern.sng 331.   ensure(rez[2]==  c(1)^2-2*c(2));
+./tests_chern.sng 333.   ensure(rez[3]==   c(1)^3-3*c(1)*c(2)+3*c(3));
+./tests_chern.sng 335.   ensure(rez[4]==   c(1)^4-4*c(1)^2*c(2)+2*c(2)^2+4*c(1)*c(3) );
+./tests_chern.sng 337.   ensure(rez[5]==   c(1)^5-5*c(1)^3*c(2)+5*c(1)*c(2)^2+5*c(1)^2*c(3)-5*c(2)*c(3));
+./tests_chern.sng 339.   return(check(s));
+./tests_chern.sng 341. }
+./tests_chern.sng 342> 
+./tests_chern.sng 343. proc test_chAll()
+./tests_chern.sng 344. {
+./tests_chern.sng 345.   string s="chAll()";
+./tests_chern.sng 347.   // Chern character (terms of degree 1, 2, 3)
+./tests_chern.sng 349.   // corresponding to the Chern classes c(1), c(2), c(3):
+./tests_chern.sng 351.   ring r = 0, (c(1..3)), dp;
+./tests_chern.sng 353.   list l=(c(1..3));
+./tests_chern.sng 355.   list rez= chAll(l);
+./tests_chern.sng 357.   ensure(rez[1]==   c(1));
+./tests_chern.sng 359.   ensure(rez[2]==   1/2*c(1)^2-c(2));
+./tests_chern.sng 361.   ensure(rez[3]==   1/6*c(1)^3-1/2*c(1)*c(2)+1/2*c(3));
+./tests_chern.sng 363.   // terms up to degree 5 in the same situation
+./tests_chern.sng 365.   rez=chAll(l, 5);
+./tests_chern.sng 367.   ensure(rez[1]==   c(1));
+./tests_chern.sng 369.   ensure(rez[2]==   1/2*c(1)^2-c(2));
+./tests_chern.sng 371.   ensure(rez[3]==   1/6*c(1)^3-1/2*c(1)*c(2)+1/2*c(3));
+./tests_chern.sng 373.   ensure(rez[4]==   1/24*c(1)^4-1/6*c(1)^2*c(2)+1/12*c(2)^2+1/6*c(1)*c(3));
+./tests_chern.sng 375.   ensure(rez[5]==   1/120*c(1)^5-1/24*c(1)^3*c(2)+1/24*c(1)*c(2)^2+1/24*c(1)^2*c(3)-1/24*c(2)*c(3));
+./tests_chern.sng 377.   return(check(s));
+./tests_chern.sng 379. 
+./tests_chern.sng 381. }
+./tests_chern.sng 382> 
+./tests_chern.sng 383. proc test_chAllInv()
+./tests_chern.sng 384. {
+./tests_chern.sng 385.   string s="chAllInv()";
+./tests_chern.sng 387.   // first 3 Chern classes in terms of the first 3 terms
+./tests_chern.sng 389.   // of the Chern character Chern  ch(1), ch(2), ch(3):
+./tests_chern.sng 391.   ring r = 0, (ch(1..3)), dp;
+./tests_chern.sng 393.   list l=(ch(1..3));
+./tests_chern.sng 395.   list rez= chAllInv(l);
+./tests_chern.sng 397.   ensure(rez[1]==   ch(1));
+./tests_chern.sng 399.   ensure(rez[2]==   1/2*ch(1)^2-ch(2));
+./tests_chern.sng 401.   ensure(rez[3]==   1/6*ch(1)^3-ch(1)*ch(2)+2*ch(3));
+./tests_chern.sng 403.   // let's see that chAllInv() is inverse to chAll()
+./tests_chern.sng 405.   rez=chAll( chAllInv(l) ) ;
+./tests_chern.sng 407.   ensure(rez[1]==   ch(1));
+./tests_chern.sng 409.   ensure(rez[2]==   ch(2));
+./tests_chern.sng 411.   ensure(rez[3]==   ch(3));
+./tests_chern.sng 413.   return(check(s));
+./tests_chern.sng 415. }
+./tests_chern.sng 416> 
+./tests_chern.sng 417. proc test_chHE()
+./tests_chern.sng 418. {
+./tests_chern.sng 419.   string s="chHE()"; 
+./tests_chern.sng 421.   ring r = 0, (c(1..3)), dp;
+./tests_chern.sng 423.   list l=c(1..3);
+./tests_chern.sng 425.   //the third degree term of the Chern character
+./tests_chern.sng 427.   poly rez= chHE(l);
+./tests_chern.sng 429.   ensure(rez== 1/6*c(1)^3-1/2*c(1)*c(2)+1/2*c(3));
+./tests_chern.sng 431.   return(check(s));
+./tests_chern.sng 433. }
+./tests_chern.sng 434> 
+./tests_chern.sng 435. 
+./tests_chern.sng 436. proc test_ChernRootsSum()
+./tests_chern.sng 437. {
+./tests_chern.sng 438.   string s="ChernRootsSum()";
+./tests_chern.sng 440.   ring r = 0, (a(1..3), b(1..2)), dp;
+./tests_chern.sng 442.   // assume a(1), a(2), a(3) are the Chern roots of a vector bundle E
+./tests_chern.sng 444.   // assume b(1), b(2) are the Chern roots of a vector bundle F
+./tests_chern.sng 446.   list l=a(1..3);
+./tests_chern.sng 448.   list L=b(1..2);
+./tests_chern.sng 450.   // the Chern roots of their direct sum is
+./tests_chern.sng 452.   list rez= ChernRootsSum(l, L);
+./tests_chern.sng 454.   ensure(rez[1]== a(1));
+./tests_chern.sng 456.   ensure(rez[2]== a(2));
+./tests_chern.sng 458.   ensure(rez[3]== a(3));
+./tests_chern.sng 460.   ensure(rez[4]== b(1));
+./tests_chern.sng 462.   ensure(rez[5]== b(2));
+./tests_chern.sng 464.   return(check(s));
+./tests_chern.sng 466. }
+./tests_chern.sng 467> 
+./tests_chern.sng 468. proc test_chSum()
+./tests_chern.sng 469. {
+./tests_chern.sng 470.   string s="chSum()";
+./tests_chern.sng 472.   ring r = 0, (c(1..3), C(1..2)), dp;
+./tests_chern.sng 474.   // Let E be a vector bundle with Chern classes c(1), c(2), c(3).
+./tests_chern.sng 476.   // Let F be a vector bundle with Chern classes C(1), C(2).
+./tests_chern.sng 478.   list l=c(1..3);
+./tests_chern.sng 480.   list L=C(1..2);
+./tests_chern.sng 482.   // Then the Chern classes of their direct sum are
+./tests_chern.sng 484.   list rez= chSum(l, L);
+./tests_chern.sng 486.   ensure(rez[1]== c(1)+C(1));
+./tests_chern.sng 488.   ensure(rez[2]== c(1)*C(1)+c(2)+C(2));
+./tests_chern.sng 490.   ensure(rez[3]== c(2)*C(1)+c(1)*C(2)+c(3));
+./tests_chern.sng 492.   ensure(rez[4]== c(3)*C(1)+c(2)*C(2));
+./tests_chern.sng 494.   ensure(rez[5]== c(3)*C(2));
+./tests_chern.sng 496.   return(check(s));
+./tests_chern.sng 498. 
+./tests_chern.sng 500. }
+./tests_chern.sng 501> 
+./tests_chern.sng 502. proc test_ChernRootsDual()
+./tests_chern.sng 503. {
+./tests_chern.sng 504.   string s="ChernRootsDual()";
+./tests_chern.sng 506.   ring r = 0, (a(1..3)), dp;
+./tests_chern.sng 508.   // assume a(1), a(2), a(3) are the Chern roots of a vector bundle
+./tests_chern.sng 510.   list l=a(1..3);
+./tests_chern.sng 512.   // the Chern roots of the dual vector bundle
+./tests_chern.sng 514.   list rez=ChernRootsDual(l);
+./tests_chern.sng 516.   ensure(rez[1]==   -a(1));
+./tests_chern.sng 518.   ensure(rez[2]==  -a(2));
+./tests_chern.sng 520.   ensure(rez[3]==  -a(3));
+./tests_chern.sng 522.   return(check(s));
+./tests_chern.sng 524. }
+./tests_chern.sng 525> 
+./tests_chern.sng 526. proc test_chDual()
+./tests_chern.sng 527. {
+./tests_chern.sng 528.   string s="chDual()";
+./tests_chern.sng 530.   // Chern classes of a vector bundle that is dual to a vector bundle
+./tests_chern.sng 532.   // with Chern classes c(1), c(2), c(3)
+./tests_chern.sng 534.   ring r=0, (c(1..3)), dp;
+./tests_chern.sng 536.   list l=c(1..3);
+./tests_chern.sng 538.   list rez=chDual(l);
+./tests_chern.sng 540.   ensure(rez[1]== -c(1));
+./tests_chern.sng 542.   ensure(rez[2]==   c(2));
+./tests_chern.sng 544.   ensure(rez[3]==  -c(3));
+./tests_chern.sng 546. 
+./tests_chern.sng 548.   return(check(s));
+./tests_chern.sng 550. }
+./tests_chern.sng 551> 
+./tests_chern.sng 552. proc test_ChernRootsProd()
+./tests_chern.sng 553. {
+./tests_chern.sng 554.   string s="ChernRootsProd()";
+./tests_chern.sng 556.   ring r=0, (a(1..2), b(1..3)), dp;
+./tests_chern.sng 558.   list l=a(1..2);
+./tests_chern.sng 560.   list L=b(1..3);
+./tests_chern.sng 562.   // Chern roots of the tensor product of a vector bundle with Chern roots a(1), a(2)
+./tests_chern.sng 564.   // and a vector bundle with Chern roots b(1), b(2), b(3)
+./tests_chern.sng 566.   list rez= ChernRootsProd(l, L);
+./tests_chern.sng 568.   ensure(rez[1]==   a(1)+b(1));
+./tests_chern.sng 570.   ensure(rez[2]==    a(1)+b(2));
+./tests_chern.sng 572.   ensure(rez[3]==   a(1)+b(3));
+./tests_chern.sng 574.   ensure(rez[4]==   a(2)+b(1));
+./tests_chern.sng 576.   ensure(rez[5]==  a(2)+b(2));
+./tests_chern.sng 578.   ensure(rez[6]==   a(2)+b(3));
+./tests_chern.sng 580.   return(check(s));
+./tests_chern.sng 582. }
+./tests_chern.sng 583> 
+./tests_chern.sng 584. proc test_chProd()
+./tests_chern.sng 585. {
+./tests_chern.sng 586.   string s="chProd";
+./tests_chern.sng 588.   ring H = 0, ( r, R, c(1..3), C(1..2) ), dp;
+./tests_chern.sng 590.   list l=c(1..3);
+./tests_chern.sng 592.   list L=C(1..2);
+./tests_chern.sng 594.   // the Chern classes of the tensor product of a vector bundle E of rank 3
+./tests_chern.sng 596.   // with Chern classes c(1), c(2), c(3)
+./tests_chern.sng 598.   // and a vector bundle F of rank 2 with Chern classes C(1) and C(2):
+./tests_chern.sng 600.   list rez= chProd(3, l, 2, L) ;
+./tests_chern.sng 602.   ensure(rez[1]==   2*c(1)+3*C(1));
+./tests_chern.sng 604.   ensure(rez[2]==  c(1)^2+5*c(1)*C(1)+3*C(1)^2+2*c(2)+3*C(2));
+./tests_chern.sng 606.   ensure(rez[3]==   2*c(1)^2*C(1)+4*c(1)*C(1)^2+C(1)^3+2*c(1)*c(2)+4*c(2)*C(1)+4*c(1)*C(2)+6*C(1)*C(2)+2*c(3));
+./tests_chern.sng 608.   ensure(rez[4]==  c(1)^2*C(1)^2+c(1)*C(1)^3+3*c(1)*c(2)*C(1)+3*c(2)*C(1)^2+2*c(1)^2*C(2)+6*c(1)*C(1)*C(2)+3*C(1)^2*C(2)+c(2)^2+2*c(1)*c(3)+3*c(3)*C(1)+3*C(2)^2);
+./tests_chern.sng 610.   ensure(rez[5]==  c(1)*c(2)*C(1)^2+c(2)*C(1)^3+2*c(1)^2*C(1)*C(2)+2*c(1)*C(1)^2*C(2)+c(2)^2*C(1)+2*c(1)*c(3)*C(1)+3*c(3)*C(1)^2+2*c(1)*c(2)*C(2)+2*c(1)*C(2)^2+3*C(1)*C(2)^2+2*c(2)*c(3)-6*c(3)*C(2));
+./tests_chern.sng 612.   ensure(rez[6]==  c(1)*c(3)*C(1)^2+c(3)*C(1)^3+c(1)*c(2)*C(1)*C(2)+c(2)*C(1)^2*C(2)+c(1)^2*C(2)^2+c(1)*C(1)*C(2)^2+c(2)*c(3)*C(1)+c(2)^2*C(2)-2*c(1)*c(3)*C(2)-3*c(3)*C(1)*C(2)-2*c(2)*C(2)^2+C(2)^3+c(3)^2);
+./tests_chern.sng 614.   // the first two Chern classes of the tensor product
+./tests_chern.sng 616.   // of a vector bundle E of rank r with Chern classes c(1) and c(2)
+./tests_chern.sng 618.   // and a vector bundle G of rank R with Chern classes C(1) and C(2)
+./tests_chern.sng 620.   // this gives the Chern classes of a tensor product on a complex surface
+./tests_chern.sng 622.   l=c(1..2);
+./tests_chern.sng 624.   L=C(1..2);
+./tests_chern.sng 626.   rez= chProd(r, l, R, L, 2 );
+./tests_chern.sng 628.   ensure(rez[1]==   R*c(1)+r*C(1));
+./tests_chern.sng 630.   ensure(rez[2]==   1/2*R^2*c(1)^2+r*R*c(1)*C(1)+1/2*r^2*C(1)^2-1/2*R*c(1)^2-1/2*r*C(1)^2+R*c(2)-c(1)*C(1)+r*C(2));
+./tests_chern.sng 632.   return(check(s));
+./tests_chern.sng 634. 
+./tests_chern.sng 636. }
+./tests_chern.sng 637> 
+./tests_chern.sng 638. proc test_chProdE()
+./tests_chern.sng 639. {
+./tests_chern.sng 640.   string s="chProdE()";
+./tests_chern.sng 642.   ring H = 0, ( c(1..3), C(1..2) ), dp;
+./tests_chern.sng 644.   list l=c(1..3);
+./tests_chern.sng 646.   list L=C(1..2);
+./tests_chern.sng 648.   // the Chern classes of the tensor product of a vector bundle E of rank 3
+./tests_chern.sng 650.   // with Chern classes c(1), c(2), c(3)
+./tests_chern.sng 652.   // and a vector bundle F of rank 2 with Chern classes C(1) and C(2):
+./tests_chern.sng 654.   list rez= chProdE(l,  L);
+./tests_chern.sng 656.   ensure(rez[1]==   2*c(1)+3*C(1));
+./tests_chern.sng 658.   ensure(rez[2]==   c(1)^2+5*c(1)*C(1)+3*C(1)^2+2*c(2)+3*C(2));
+./tests_chern.sng 660.   ensure(rez[3]==   2*c(1)^2*C(1)+4*c(1)*C(1)^2+C(1)^3+2*c(1)*c(2)+4*c(2)*C(1)+4*c(1)*C(2)+6*C(1)*C(2)+2*c(3));
+./tests_chern.sng 662.   ensure(rez[4]==   c(1)^2*C(1)^2+c(1)*C(1)^3+3*c(1)*c(2)*C(1)+3*c(2)*C(1)^2+2*c(1)^2*C(2)+6*c(1)*C(1)*C(2)+3*C(1)^2*C(2)+c(2)^2+2*c(1)*c(3)+3*c(3)*C(1)+3*C(2)^2);
+./tests_chern.sng 664.   ensure(rez[5]==   c(1)*c(2)*C(1)^2+c(2)*C(1)^3+2*c(1)^2*C(1)*C(2)+2*c(1)*C(1)^2*C(2)+c(2)^2*C(1)+2*c(1)*c(3)*C(1)+3*c(3)*C(1)^2+2*c(1)*c(2)*C(2)+2*c(1)*C(2)^2+3*C(1)*C(2)^2+2*c(2)*c(3)-6*c(3)*C(2));
+./tests_chern.sng 666.   ensure(rez[6]==   c(1)*c(3)*C(1)^2+c(3)*C(1)^3+c(1)*c(2)*C(1)*C(2)+c(2)*C(1)^2*C(2)+c(1)^2*C(2)^2+c(1)*C(1)*C(2)^2+c(2)*c(3)*C(1)+c(2)^2*C(2)-2*c(1)*c(3)*C(2)-3*c(3)*C(1)*C(2)-2*c(2)*C(2)^2+C(2)^3+c(3)^2);
+./tests_chern.sng 668.   return(check(s));
+./tests_chern.sng 670. }
+./tests_chern.sng 671> 
+./tests_chern.sng 672. proc test_chProdL()
+./tests_chern.sng 673. {
+./tests_chern.sng 674.   string s="chProdL()";
+./tests_chern.sng 676.   // The Chern classes of the tensor product of a vector bundle of rank 3
+./tests_chern.sng 678.   // with Chern classes c(1), c(2), c(3) and a vector bundle of rank 1 with
+./tests_chern.sng 680.   // Chern class C(1)
+./tests_chern.sng 682.   ring r = 0, ( c(1..3), C(1)), dp;
+./tests_chern.sng 684.   list c=c(1..3);
+./tests_chern.sng 686.   list C=C(1);
+./tests_chern.sng 688.   list rez= chProdL(3,c,1,C);
+./tests_chern.sng 690.   ensure(rez[1]==  c(1)+3*C(1));
+./tests_chern.sng 692.   ensure(rez[2]==  2*c(1)*C(1)+3*C(1)^2+c(2));
+./tests_chern.sng 694.   ensure(rez[3]==  c(1)*C(1)^2+C(1)^3+c(2)*C(1)+c(3));
+./tests_chern.sng 696.   return(check(s));
+./tests_chern.sng 698. }
+./tests_chern.sng 699> 
+./tests_chern.sng 700. 
+./tests_chern.sng 701. proc test_chProdLP()
+./tests_chern.sng 702. {
+./tests_chern.sng 703.   string s="chProdLP()";
+./tests_chern.sng 705.   // The total Chern class of the tensor product of a vector bundle of rank 3
+./tests_chern.sng 707.   // with Chern classes c(1), c(2), c(3) and a vector bundle of rank 1 with
+./tests_chern.sng 709.   // Chern class C(1)
+./tests_chern.sng 711.   ring r = 0, ( c(1..3), C(1)), ws(1,2,3, 1);
+./tests_chern.sng 713.   list c=c(1..3);
+./tests_chern.sng 715.   list C=C(1);
+./tests_chern.sng 717.   poly rez= chProdLP(3,c,1,C);
+./tests_chern.sng 719.   ensure(rez==1+c(1)+3*C(1)+c(2)+2*c(1)*C(1)+3*C(1)^2+c(3)+c(2)*C(1)+c(1)*C(1)^2+C(1)^3);
+./tests_chern.sng 721.   return(check(s));
+./tests_chern.sng 723. }
+./tests_chern.sng 724> 
+./tests_chern.sng 725. proc test_chProdM()
+./tests_chern.sng 726. {
+./tests_chern.sng 727.   string s="chProdM()";
+./tests_chern.sng 729.   // The Chern classes of the tensor product of a vector bundle of rank 3
+./tests_chern.sng 731.   // with Chern classes c(1), c(2), c(3) and a vector bundle of rank 1 with
+./tests_chern.sng 733.   // Chern class C(1)
+./tests_chern.sng 735.   ring r = 0, ( c(1..3), C(1)), dp;
+./tests_chern.sng 737.   list c=c(1..3);
+./tests_chern.sng 739.   list C=C(1);
+./tests_chern.sng 741.   list rez= chProdM(3,c,1,C);
+./tests_chern.sng 743.   ensure(rez[1]==  c(1)+3*C(1));
+./tests_chern.sng 745.   ensure(rez[2]==  2*c(1)*C(1)+3*C(1)^2+c(2));
+./tests_chern.sng 747.   ensure(rez[3]==  c(1)*C(1)^2+C(1)^3+c(2)*C(1)+c(3));
+./tests_chern.sng 749.   return(check(s));
+./tests_chern.sng 751. }
+./tests_chern.sng 752> 
+./tests_chern.sng 753. 
+./tests_chern.sng 754. proc test_chProdMP()
+./tests_chern.sng 755. {
+./tests_chern.sng 756.   string s="chProdMP()";
+./tests_chern.sng 758.   // The total Chern class of the tensor product of a vector bundle of rank 3
+./tests_chern.sng 760.   // with Chern classes c(1), c(2), c(3) and a vector bundle of rank 1 with
+./tests_chern.sng 762.   // Chern class C(1)
+./tests_chern.sng 764.   ring r = 0, ( c(1..3), C(1)), ws(1,2,3, 1);
+./tests_chern.sng 766.   list c=c(1..3);
+./tests_chern.sng 768.   list C=C(1);
+./tests_chern.sng 770.   poly rez= chProdMP(3,c,1,C);
+./tests_chern.sng 772.   ensure(rez==1+c(1)+3*C(1)+c(2)+2*c(1)*C(1)+3*C(1)^2+c(3)+c(2)*C(1)+c(1)*C(1)^2+C(1)^3);
+./tests_chern.sng 774.   return(check(s));
+./tests_chern.sng 776. }
+./tests_chern.sng 777> 
+./tests_chern.sng 778. proc test_ChernRootsHom()
+./tests_chern.sng 779. {
+./tests_chern.sng 780.   string s="ChernRootsHom()";
+./tests_chern.sng 782.   ring r=0, (a(1..2), b(1..3)), dp;
+./tests_chern.sng 784.   list l=a(1..2);
+./tests_chern.sng 786.   list L=b(1..3);
+./tests_chern.sng 788.   // Let E be a vector bundle with Chern roots a(1). a(2),
+./tests_chern.sng 790.   // let F be a vector bundle with CHern roots b(1), b(2), b(3).
+./tests_chern.sng 792.   // Then the Chern roots of Hom(E, F) are
+./tests_chern.sng 794.   list rez=ChernRootsHom(l, L);
+./tests_chern.sng 796.   ensure(rez[1]== -a(1)+b(1));
+./tests_chern.sng 798.   ensure(rez[2]==   -a(1)+b(2));
+./tests_chern.sng 800.   ensure(rez[3]==   -a(1)+b(3));
+./tests_chern.sng 802.   ensure(rez[4]==   -a(2)+b(1));
+./tests_chern.sng 804.   ensure(rez[5]==   -a(2)+b(2));
+./tests_chern.sng 806.   ensure(rez[6]==   -a(2)+b(3));
+./tests_chern.sng 808.   return(check(s));
+./tests_chern.sng 810. 
+./tests_chern.sng 812. }
+./tests_chern.sng 813> 
+./tests_chern.sng 814. proc test_chHom()
+./tests_chern.sng 815. {
+./tests_chern.sng 816.   string s="chHom()";
+./tests_chern.sng 818.   ring H = 0, ( r, R, c(1..3), C(1..2) ), dp;
+./tests_chern.sng 820.   list l=c(1..3);
+./tests_chern.sng 822.   list L=C(1..2);
+./tests_chern.sng 824.   // the Chern classes of Hom(E, F) for a vector bundle E of rank 3
+./tests_chern.sng 826.   // with Chern classes c(1), c(2), c(3)
+./tests_chern.sng 828.   // and a vector bundle F of rank 2 with Chern classes C(1) and C(2):
+./tests_chern.sng 830.   list rez= chHom(3, l, 2, L);
+./tests_chern.sng 832.   ensure(rez[1]==  -2*c(1)+3*C(1));
+./tests_chern.sng 834.   ensure(rez[2]==  c(1)^2-5*c(1)*C(1)+3*C(1)^2+2*c(2)+3*C(2));
+./tests_chern.sng 836.   ensure(rez[3]==  2*c(1)^2*C(1)-4*c(1)*C(1)^2+C(1)^3-2*c(1)*c(2)+4*c(2)*C(1)-4*c(1)*C(2)+6*C(1)*C(2)-2*c(3));
+./tests_chern.sng 838.   ensure(rez[4]==  c(1)^2*C(1)^2-c(1)*C(1)^3-3*c(1)*c(2)*C(1)+3*c(2)*C(1)^2+2*c(1)^2*C(2)-6*c(1)*C(1)*C(2)+3*C(1)^2*C(2)+c(2)^2+2*c(1)*c(3)-3*c(3)*C(1)+3*C(2)^2);
+./tests_chern.sng 840.   ensure(rez[5]==  -c(1)*c(2)*C(1)^2+c(2)*C(1)^3+2*c(1)^2*C(1)*C(2)-2*c(1)*C(1)^2*C(2)+c(2)^2*C(1)+2*c(1)*c(3)*C(1)-3*c(3)*C(1)^2-2*c(1)*c(2)*C(2)-2*c(1)*C(2)^2+3*C(1)*C(2)^2-2*c(2)*c(3)+6*c(3)*C(2));
+./tests_chern.sng 842.   ensure(rez[6]==  c(1)*c(3)*C(1)^2-c(3)*C(1)^3-c(1)*c(2)*C(1)*C(2)+c(2)*C(1)^2*C(2)+c(1)^2*C(2)^2-c(1)*C(1)*C(2)^2-c(2)*c(3)*C(1)+c(2)^2*C(2)-2*c(1)*c(3)*C(2)+3*c(3)*C(1)*C(2)-2*c(2)*C(2)^2+C(2)^3+c(3)^2);
+./tests_chern.sng 844.   
+./tests_chern.sng 846.   // the first two Chern classes of Hom(E, F) for a vector bundle E of rank r
+./tests_chern.sng 848.   // with Chern classes c(1) and c(2)
+./tests_chern.sng 850.   // and a vector bundle G of rank R with Chern classes C(1) and C(2)
+./tests_chern.sng 852.   // this gives the Chern classes of a tensor product on a complex surface
+./tests_chern.sng 854.   l=c(1..2);
+./tests_chern.sng 856.   L=C(1..2);
+./tests_chern.sng 858.   rez= chHom(r, l, R, L, 2 ) ;
+./tests_chern.sng 860.   ensure(rez[1]==  -R*c(1)+r*C(1));
+./tests_chern.sng 862.   ensure(rez[2]==   1/2*R^2*c(1)^2-r*R*c(1)*C(1)+1/2*r^2*C(1)^2-1/2*R*c(1)^2-1/2*r*C(1)^2+R*c(2)+c(1)*C(1)+r*C(2));
+./tests_chern.sng 864.   return(check(s));
+./tests_chern.sng 866. }
+./tests_chern.sng 867> 
+./tests_chern.sng 868. proc test_ChernRootsSymm()
+./tests_chern.sng 869. {
+./tests_chern.sng 870.   string s="ChernRootsSymm()"; 
+./tests_chern.sng 872.   ring r=0, (a(1..3)), dp;
+./tests_chern.sng 874.   list l=a(1..3);
+./tests_chern.sng 876.   // the Chern roots of the second symmetric power of a vector bundle
+./tests_chern.sng 878.   // with Chern  roots a(1), a(2), a(3)
+./tests_chern.sng 880.   list rez= ChernRootsSymm(2, l) ;
+./tests_chern.sng 882.   ensure(rez[1]==   2*a(1));
+./tests_chern.sng 884.   ensure(rez[2]==   a(1)+a(2));
+./tests_chern.sng 886.   ensure(rez[3]==   a(1)+a(3));
+./tests_chern.sng 888.   ensure(rez[4]==   2*a(2));
+./tests_chern.sng 890.   ensure(rez[5]==   a(2)+a(3));
+./tests_chern.sng 892.   ensure(rez[6]==   2*a(3));
+./tests_chern.sng 894.   return(check(s));
+./tests_chern.sng 896. }
+./tests_chern.sng 897> 
+./tests_chern.sng 898. proc test_ChernRootsWedge()
+./tests_chern.sng 899. {
+./tests_chern.sng 900.   string s="ChernRootsWedge()";
+./tests_chern.sng 902.   ring r=0, (a(1..3)), dp;
+./tests_chern.sng 904.   list l=a(1..3);
+./tests_chern.sng 906.   // the Chern roots of the second exterior power of a vector bundle
+./tests_chern.sng 908.   // with Chern  roots a(1), a(2), a(3)
+./tests_chern.sng 910.   list rez= ChernRootsWedge(2, l);
+./tests_chern.sng 912.   ensure(rez[1]== a(2)+a(3));
+./tests_chern.sng 914.   ensure(rez[2]==   a(1)+a(3));
+./tests_chern.sng 916.   ensure(rez[3]==   a(1)+a(2));
+./tests_chern.sng 918.   return(check(s));
+./tests_chern.sng 920. }
+./tests_chern.sng 921> 
+./tests_chern.sng 922. proc test_chSymm()
+./tests_chern.sng 923. {
+./tests_chern.sng 924.   string s="chSymm()";
+./tests_chern.sng 926.   ring r=0, (c(1..5)), dp;
+./tests_chern.sng 928.   list l=c(1..5);
+./tests_chern.sng 930.   // the rank and the Chern classes of the second symmetric power of a vector bundle of rank 3
+./tests_chern.sng 932.   list rez= chSymm(2, 3, l);
+./tests_chern.sng 934.   // the rank should be 6
+./tests_chern.sng 936.   ensure(rez[1]==   6);
+./tests_chern.sng 938.   rez=rez[2];
+./tests_chern.sng 940.   ensure(rez[1]== 4*c(1));
+./tests_chern.sng 942.   ensure(rez[2]== 5*c(1)^2+5*c(2));
+./tests_chern.sng 944.   ensure(rez[3]== 2*c(1)^3+11*c(1)*c(2)+7*c(3));
+./tests_chern.sng 946.   ensure(rez[4]== 6*c(1)^2*c(2)+4*c(2)^2+14*c(1)*c(3));
+./tests_chern.sng 948.   ensure(rez[5]== 4*c(1)*c(2)^2+8*c(1)^2*c(3)+4*c(2)*c(3));
+./tests_chern.sng 950.   ensure(rez[6]== 8*c(1)*c(2)*c(3)-8*c(3)^2);
+./tests_chern.sng 952.   // the rank and the first 3 Chern classes
+./tests_chern.sng 954.   // of the second symmetric power of a vector bundle of rank 5
+./tests_chern.sng 956.   rez= chSymm(2, 5, l, 1, 2, 3);
+./tests_chern.sng 958.   ensure(rez[1]==   15);
+./tests_chern.sng 960.   rez=rez[2];
+./tests_chern.sng 962.   ensure(rez[1]== 6*c(1));
+./tests_chern.sng 964.   ensure(rez[2]== 14*c(1)^2+7*c(2));
+./tests_chern.sng 966.   ensure(rez[3]== 16*c(1)^3+31*c(1)*c(2)+9*c(3));
+./tests_chern.sng 968.   return(check(s));
+./tests_chern.sng 970. }
+./tests_chern.sng 971> 
+./tests_chern.sng 972. proc test_chSymm2L()
+./tests_chern.sng 973. {
+./tests_chern.sng 974.   string s="chSymm2L()";
+./tests_chern.sng 976.   ring r=0, (c(1..2)), dp;
+./tests_chern.sng 978.   list l=c(1..2);
+./tests_chern.sng 980.   // the Chern classes of the second symmetric power of a vector bundle of rank 2
+./tests_chern.sng 982.   list rez= chSymm2L(2, l);
+./tests_chern.sng 984.   ensure(rez[1]== 3);
+./tests_chern.sng 986.   rez=rez[2];
+./tests_chern.sng 988.   ensure(rez[1]== 3*c(1));
+./tests_chern.sng 990.   ensure(rez[2]== 2*c(1)^2+4*c(2));
+./tests_chern.sng 992.   ensure(rez[3]== 4*c(1)*c(2));
+./tests_chern.sng 994.   return(check(s));
+./tests_chern.sng 996. }
+./tests_chern.sng 997> 
+./tests_chern.sng 998. proc test_chSymm2LP()
+./tests_chern.sng 999. {
+./tests_chern.sng 1000.   string s="chSymm2LP()";
+./tests_chern.sng 1002.   ring r=0, (c(1..2)), ws(1, 2);
+./tests_chern.sng 1004.   list l=c(1..2);
+./tests_chern.sng 1006.   // the total Chern class of the second symmetric power of a vector bundle of rank 2
+./tests_chern.sng 1008.   poly rez=chSymm2LP(2, l);
+./tests_chern.sng 1010.   ensure(rez==1+3*c(1)+2*c(1)^2+4*c(2)+4*c(1)*c(2));
+./tests_chern.sng 1012.   return(check(s));
+./tests_chern.sng 1014. }
+./tests_chern.sng 1015> 
+./tests_chern.sng 1016. 
+./tests_chern.sng 1017. proc test_chWedge()
+./tests_chern.sng 1018. {
+./tests_chern.sng 1019.   string s="chWedge()";
+./tests_chern.sng 1021.   ring r=0, (c(1..5)), dp;
+./tests_chern.sng 1023.   list l=c(1..5);
+./tests_chern.sng 1025.   // the rank and the Chern classes of the second exterior power of a vector bundle of rank 3
+./tests_chern.sng 1027.   list rez=chWedge(2, 3, l);
+./tests_chern.sng 1029.   ensure(rez[1]== 3);
+./tests_chern.sng 1031.   rez=rez[2];
+./tests_chern.sng 1033.   ensure(rez[1]== 2*c(1));
+./tests_chern.sng 1035.   ensure(rez[2]== c(1)^2+c(2));
+./tests_chern.sng 1037.   ensure(rez[3]== c(1)*c(2)-c(3));
+./tests_chern.sng 1039.   // the rank and the first 3 Chern classes
+./tests_chern.sng 1041.   // of the fourth exterior power of a vector bundle of rank 5
+./tests_chern.sng 1043.   rez= chWedge(4, 5, l, 1, 2, 3);
+./tests_chern.sng 1045.   ensure(rez[1]== 5);
+./tests_chern.sng 1047.   rez=rez[2];
+./tests_chern.sng 1049.   ensure(rez[1]==4*c(1));
+./tests_chern.sng 1051.   ensure(rez[2]==6*c(1)^2+c(2));
+./tests_chern.sng 1053.   ensure(rez[3]==  4*c(1)^3+3*c(1)*c(2)-c(3));
+./tests_chern.sng 1055.   return(check(s));
+./tests_chern.sng 1057. }
+./tests_chern.sng 1058> 
+./tests_chern.sng 1059. proc test_chWedge2L()
+./tests_chern.sng 1060. {
+./tests_chern.sng 1061.   string s="chWedge2L()";
+./tests_chern.sng 1063.   ring r=0, (c(1..3)), dp;
+./tests_chern.sng 1065.   list l=c(1..3);
+./tests_chern.sng 1067.   // the Chern classes of the second exterior power of a vector bundle of rank 3
+./tests_chern.sng 1069.   list rez=chWedge2L(3, l);
+./tests_chern.sng 1071.   ensure(rez[1]== 3);
+./tests_chern.sng 1073.   rez=rez[2];
+./tests_chern.sng 1075.   ensure(rez[1]== 2*c(1));
+./tests_chern.sng 1077.   ensure(rez[2]== c(1)^2+c(2));
+./tests_chern.sng 1079.   ensure(rez[3]== c(1)*c(2)-c(3));
+./tests_chern.sng 1081.   return(check(s));
+./tests_chern.sng 1083. }
+./tests_chern.sng 1084> 
+./tests_chern.sng 1085. proc test_chWedge2LP()
+./tests_chern.sng 1086. {
+./tests_chern.sng 1087. string s="chWedge2LP()";
+./tests_chern.sng 1089.   ring r=0, (c(1..3)), ws(1,2,3);
+./tests_chern.sng 1091.   list l=c(1..3);
+./tests_chern.sng 1093.   // the total Chern class of the second exterior power of a vector bundle of rank 3
+./tests_chern.sng 1095.   poly rez=chWedge2LP(3, l);
+./tests_chern.sng 1097.   ensure(rez==1+2*c(1)+c(1)^2+c(2)+c(1)*c(2)-c(3) );
+./tests_chern.sng 1099.   return(check(s));
+./tests_chern.sng 1101. }
+./tests_chern.sng 1102> 
+./tests_chern.sng 1103. proc test_todd()
+./tests_chern.sng 1104. {
+./tests_chern.sng 1105.   string s="todd()";
+./tests_chern.sng 1107.   // the terms of the Todd class up to degree 5
+./tests_chern.sng 1109.   // in terms of the Chern classes c(1), c(2), c(3), c(4), c(5)
+./tests_chern.sng 1111.   ring r=0, (c(1..5)), dp;
+./tests_chern.sng 1113.   list l=c(1..5);
+./tests_chern.sng 1115.   list rez= todd( l );
+./tests_chern.sng 1117.   ensure(rez[1]== 1/2*c(1));
+./tests_chern.sng 1119.   ensure(rez[2]==  1/12*c(1)^2+1/12*c(2));
+./tests_chern.sng 1121.   ensure(rez[3]== 1/24*c(1)*c(2));
+./tests_chern.sng 1123.   ensure(rez[4]==   -1/720*c(1)^4+1/180*c(1)^2*c(2)+1/240*c(2)^2+1/720*c(1)*c(3)-1/720*c(4));
+./tests_chern.sng 1125.   ensure(rez[5]==   -1/1440*c(1)^3*c(2)+1/480*c(1)*c(2)^2+1/1440*c(1)^2*c(3)-1/1440*c(1)*c(4));
+./tests_chern.sng 1127.   // in the same situation compute only first two terms
+./tests_chern.sng 1129.   rez= todd(l, 2);
+./tests_chern.sng 1131.   ensure(rez[1]== 1/2*c(1));
+./tests_chern.sng 1133.   ensure(rez[2]==  1/12*c(1)^2+1/12*c(2));
+./tests_chern.sng 1135. 
+./tests_chern.sng 1137.   // compute the first 5 terms corresponding to the Chern classes c(1), c(2)
+./tests_chern.sng 1139.   l=c(1..2);
+./tests_chern.sng 1141.   rez= todd(l, 5) ;
+./tests_chern.sng 1143.   ensure(rez[1]==  1/2*c(1));
+./tests_chern.sng 1145.   ensure(rez[2]==    1/12*c(1)^2+1/12*c(2));
+./tests_chern.sng 1147.   ensure(rez[3]==   1/24*c(1)*c(2));
+./tests_chern.sng 1149.   ensure(rez[4]==   -1/720*c(1)^4+1/180*c(1)^2*c(2)+1/240*c(2)^2);
+./tests_chern.sng 1151.   ensure(rez[5]==   -1/1440*c(1)^3*c(2)+1/480*c(1)*c(2)^2);
+./tests_chern.sng 1153.   return(check(s));
+./tests_chern.sng 1155. }
+./tests_chern.sng 1156> 
+./tests_chern.sng 1157. 
+./tests_chern.sng 1158. proc test_toddE()
+./tests_chern.sng 1159. {
+./tests_chern.sng 1160.   string s="toddE()";
+./tests_chern.sng 1162.   // first  3 terms of the Todd class in terms of the Chern classes c(1), c(2), c(3)
+./tests_chern.sng 1164.   ring r=0, (c(1..3)), dp;
+./tests_chern.sng 1166.   list l;
+./tests_chern.sng 1168.   //first term
+./tests_chern.sng 1170.   l=c(1);
+./tests_chern.sng 1172.   poly rez= toddE( l );
+./tests_chern.sng 1174.   ensure(rez==1/2*c(1));
+./tests_chern.sng 1176.   // second term
+./tests_chern.sng 1178.   l=c(1..2);
+./tests_chern.sng 1180.   rez= toddE( l );
+./tests_chern.sng 1182.   ensure(rez== 1/12*c(1)^2+1/12*c(2));
+./tests_chern.sng 1184.   // third term
+./tests_chern.sng 1186.   l=c(1..3);
+./tests_chern.sng 1188.   rez= toddE( l );
+./tests_chern.sng 1190.   ensure(rez==1/24*c(1)*c(2));
+./tests_chern.sng 1192.   return(check(s));
+./tests_chern.sng 1194. }
+./tests_chern.sng 1195> 
+./tests_chern.sng 1196. proc test_Bern()
+./tests_chern.sng 1197. {
+./tests_chern.sng 1198.   string s="Bern()";
+./tests_chern.sng 1200.   // first 10 Bernoulli numbers: B(0), ..., B(9)
+./tests_chern.sng 1202.   ring r=0,(t), dp;
+./tests_chern.sng 1204.   list rez= Bern(9);
+./tests_chern.sng 1206.   ensure(rez[1]==1);
+./tests_chern.sng 1208.   ensure(rez[2]==1/2);
+./tests_chern.sng 1210.   ensure(rez[3]==1/6);
+./tests_chern.sng 1212.   ensure(rez[4]==0);
+./tests_chern.sng 1214.   ensure(rez[5]==-1/30);
+./tests_chern.sng 1216.   ensure(rez[6]==0);
+./tests_chern.sng 1218.   ensure(rez[7]==1/42);
+./tests_chern.sng 1220.   ensure(rez[8]==0);
+./tests_chern.sng 1222.   ensure(rez[9]==-1/30);
+./tests_chern.sng 1224.   ensure(rez[10]==0);
+./tests_chern.sng 1226.   return(check(s));
+./tests_chern.sng 1228. }
+./tests_chern.sng 1229> 
+./tests_chern.sng 1230. proc test_tdCf()
+./tests_chern.sng 1231. {
+./tests_chern.sng 1232.   string s="tdCf()"; 
+./tests_chern.sng 1234.   // first 5 coefficients
+./tests_chern.sng 1236.   ring r=0,(t), dp;
+./tests_chern.sng 1238.   list rez= tdCf(4);
+./tests_chern.sng 1240.   ensure(rez[1]==1);
+./tests_chern.sng 1242.   ensure(rez[2]==1/2);
+./tests_chern.sng 1244.   ensure(rez[3]==1/12);
+./tests_chern.sng 1246.   ensure(rez[4]==0);
+./tests_chern.sng 1248.   ensure(rez[5]==-1/720);
+./tests_chern.sng 1250.   return(check(s));
+./tests_chern.sng 1252. }
+./tests_chern.sng 1253> 
+./tests_chern.sng 1254. proc test_tdTerms()
+./tests_chern.sng 1255. {
+./tests_chern.sng 1256.   string s="tdTerms()";
+./tests_chern.sng 1258.   ring r=0, (t), ls;;
+./tests_chern.sng 1260.   // the terms of the Todd class of a line bundle with Chern root t up to degree 4
+./tests_chern.sng 1262.   list rez=tdTerms(4, t);
+./tests_chern.sng 1264.   ensure(rez[1]== 1);
+./tests_chern.sng 1266.   ensure(rez[2]==   1/2t);
+./tests_chern.sng 1268.   ensure(rez[3]==   1/12t2);
+./tests_chern.sng 1270.   ensure(rez[4]==   0);
+./tests_chern.sng 1272.   ensure(rez[5]==   -1/720t4);
+./tests_chern.sng 1274.   return(check(s));
+./tests_chern.sng 1276. }
+./tests_chern.sng 1277> 
+./tests_chern.sng 1278. proc test_tdFactor()
+./tests_chern.sng 1279. {
+./tests_chern.sng 1280.   string s="tdFactor()"; 
+./tests_chern.sng 1282.   // the Todd class up do degree 4
+./tests_chern.sng 1284.   ring r=0,(t), ls;
+./tests_chern.sng 1286.   poly rez= tdFactor(4, t);
+./tests_chern.sng 1288.   ensure(rez==1+1/2t+1/12t2-1/720t4);
+./tests_chern.sng 1290.   return(check(s));
+./tests_chern.sng 1292. }
+./tests_chern.sng 1293> 
+./tests_chern.sng 1294. proc test_cProj()
+./tests_chern.sng 1295. {
+./tests_chern.sng 1296.   string s="cProj()";
+./tests_chern.sng 1298.   ring r=0, (t), dp;
+./tests_chern.sng 1300.   // the coefficients of the total Chern class of the complex projective line
+./tests_chern.sng 1302.   list rez= cProj(1);
+./tests_chern.sng 1304.   ensure(rez[1]==   2);
+./tests_chern.sng 1306.   // the coefficients of the total Chern class of the complex projective plane
+./tests_chern.sng 1308.   rez= cProj(2) ;
+./tests_chern.sng 1310.   ensure(rez[1]==   3);
+./tests_chern.sng 1312.   ensure(rez[2]==   3);
+./tests_chern.sng 1314.   // the coefficients of the total Chern class of the complex projective space
+./tests_chern.sng 1316.   // of dimension three
+./tests_chern.sng 1318.   rez= cProj(3) ;
+./tests_chern.sng 1320.   ensure(rez[1]==   4);
+./tests_chern.sng 1322.   ensure(rez[2]==   6);
+./tests_chern.sng 1324.   ensure(rez[3]==   4);
+./tests_chern.sng 1326.   return(check(s));
+./tests_chern.sng 1328. }
+./tests_chern.sng 1329> 
+./tests_chern.sng 1330. proc test_chProj()
+./tests_chern.sng 1331. {
+./tests_chern.sng 1332.   string s="chProj()";
+./tests_chern.sng 1334.   ring r=0, (t), dp;
+./tests_chern.sng 1336.   // the coefficients of the Chern character of the complex projective line
+./tests_chern.sng 1338.   list rez= chProj(1);
+./tests_chern.sng 1340.   ensure(rez[1]==1);
+./tests_chern.sng 1342.   ensure(rez[2]==2);
+./tests_chern.sng 1344.   // the coefficients of the Chern character of the complex projective plane
+./tests_chern.sng 1346.   rez= chProj(2) ;
+./tests_chern.sng 1348.   ensure(rez[1]==2);
+./tests_chern.sng 1350.   ensure(rez[2]==3);
+./tests_chern.sng 1352.   ensure(rez[3]==3/2);
+./tests_chern.sng 1354.   // the coefficients of the Chern character of the complex 3-dimentional projectice space
+./tests_chern.sng 1356.   rez=chProj(3);
+./tests_chern.sng 1358.   ensure(rez[1]==3);
+./tests_chern.sng 1360.   ensure(rez[2]==4);
+./tests_chern.sng 1362.   ensure(rez[3]==2);
+./tests_chern.sng 1364.   ensure(rez[4]==2/3);
+./tests_chern.sng 1366.   return(check(s));
+./tests_chern.sng 1368. }
+./tests_chern.sng 1369> 
+./tests_chern.sng 1370. proc test_tdProj()
+./tests_chern.sng 1371. {
+./tests_chern.sng 1372.   string s="tdProj()";
+./tests_chern.sng 1374.   ring r=0, (t), dp;
+./tests_chern.sng 1376.   // the coefficients of the Todd class of the complex projective line
+./tests_chern.sng 1378.   list rez= tdProj(1);
+./tests_chern.sng 1380.   ensure(rez[1]==   1);
+./tests_chern.sng 1382.   ensure(rez[2]==   1);
+./tests_chern.sng 1384.   // the coefficients of the Todd class of the complex projective line
+./tests_chern.sng 1386.   rez= tdProj(2);
+./tests_chern.sng 1388.   ensure(rez[1]==   1);
+./tests_chern.sng 1390.   ensure(rez[2]==   3/2);
+./tests_chern.sng 1392.   ensure(rez[3]==   1);
+./tests_chern.sng 1394.   // the coefficients of the Todd class of the complex projective line
+./tests_chern.sng 1396.   rez= tdProj(3);
+./tests_chern.sng 1398.   ensure(rez[1]==  1);
+./tests_chern.sng 1400.   ensure(rez[2]==   2);
+./tests_chern.sng 1402.   ensure(rez[3]==   11/6);
+./tests_chern.sng 1404.   ensure(rez[4]==   1);
+./tests_chern.sng 1406.   return(check(s));
+./tests_chern.sng 1408. }
+./tests_chern.sng 1409> 
+./tests_chern.sng 1410. proc test_eulerChProj()
+./tests_chern.sng 1411. {
+./tests_chern.sng 1412.   string s="eulerChProj()";
+./tests_chern.sng 1414.   ring h=0, (r, c(1..3)),  ws(0,1,2,3);
+./tests_chern.sng 1416.   list l=c(1..3);
+./tests_chern.sng 1418. 
+./tests_chern.sng 1420.   // the Euler characteristic of a vector bundle on the projective line
+./tests_chern.sng 1422.   poly rez= eulerChProj(1, r, l);
+./tests_chern.sng 1424.   ensure(rez==r+c(1));
+./tests_chern.sng 1426. 
+./tests_chern.sng 1428.   // the Euler characteristic of a vector bundle on the projective plane
+./tests_chern.sng 1430.   rez= eulerChProj(2, r, l);
+./tests_chern.sng 1432.   ensure(rez==r+3/2*c(1)+1/2*c(1)^2-c(2));
+./tests_chern.sng 1434. 
+./tests_chern.sng 1436.   // the Euler characteristic of a vector bundle on P_3
+./tests_chern.sng 1438.   rez= eulerChProj(3, r, l);
+./tests_chern.sng 1440.   ensure(rez==r+11/6*c(1)+c(1)^2-2*c(2)+1/6*c(1)^3-1/2*c(1)*c(2)+1/2*c(3));
+./tests_chern.sng 1442. 
+./tests_chern.sng 1444.   // assume now that we have a bundle framed at a subplane of P_3
+./tests_chern.sng 1446.   // this implies c(1)=c(2)=0
+./tests_chern.sng 1448.   l= 0, 0, c(3);
+./tests_chern.sng 1450. 
+./tests_chern.sng 1452.   // the Euler characteristic is
+./tests_chern.sng 1454.   rez= eulerChProj(3, r, l);
+./tests_chern.sng 1456.   ensure(rez==r+1/2*c(3));
+./tests_chern.sng 1458.   // which implies that c(3) must be even in this case
+./tests_chern.sng 1460.   return(check(s));
+./tests_chern.sng 1462. }
+./tests_chern.sng 1463> 
+./tests_chern.sng 1464. proc test_chNumbersProj()
+./tests_chern.sng 1465. {
+./tests_chern.sng 1466.   string s="chNumbersProj()";
+./tests_chern.sng 1468.   ring h=0, (t), dp;
+./tests_chern.sng 1470.   // The Chern numbers of the projective plane P_2:
+./tests_chern.sng 1472.   list rez= chNumbersProj(2) ;
+./tests_chern.sng 1474.   ensure(rez[1]==9);
+./tests_chern.sng 1476.   ensure(rez[2]==   3);
+./tests_chern.sng 1478. 
+./tests_chern.sng 1480.   // The Chern numbers of P_3:
+./tests_chern.sng 1482.   rez=chNumbersProj(3);
+./tests_chern.sng 1484.   ensure(rez[1]==   64);
+./tests_chern.sng 1486.   ensure(rez[2]==   24);
+./tests_chern.sng 1488.   ensure(rez[3]==   4);
+./tests_chern.sng 1490.   return(check(s));
+./tests_chern.sng 1492. }
+./tests_chern.sng 1493> 
+./tests_chern.sng 1494. proc test_classpoly()
+./tests_chern.sng 1495. {
+./tests_chern.sng 1496.   string s="classpoly()";
+./tests_chern.sng 1498.   ring r=0, (c(1..5), t), ds;
+./tests_chern.sng 1500.   list l=c(1..5);
+./tests_chern.sng 1502.   // get the polynomial c(1)*t + c(2)*t^2 + ... + c(5)*t^5
+./tests_chern.sng 1504.   poly rez= classpoly(l, t);
+./tests_chern.sng 1506.   ensure(rez==c(1)*t+c(2)*t^2+c(3)*t^3+c(4)*t^4+c(5)*t^5);
+./tests_chern.sng 1508.   return(check(s));
+./tests_chern.sng 1510. }
+./tests_chern.sng 1511> 
+./tests_chern.sng 1512. proc test_chernPoly()
+./tests_chern.sng 1513. {
+./tests_chern.sng 1514.   string s="chernPoly()"; 
+./tests_chern.sng 1516.   ring r=0, (c(1..5), t), ds;
+./tests_chern.sng 1518.   list l=c(1..5);
+./tests_chern.sng 1520.   // get the Chern polynomial 1 + c(1)*t + c(2)*t^2 + ... + c(5)*t^5
+./tests_chern.sng 1522.   poly rez= chernPoly(l, t);
+./tests_chern.sng 1524.   ensure(rez==1+c(1)*t+c(2)*t^2+c(3)*t^3+c(4)*t^4+c(5)*t^5);
+./tests_chern.sng 1526.   return(check(s));
+./tests_chern.sng 1528. }
+./tests_chern.sng 1529> 
+./tests_chern.sng 1530. proc test_chernCharPoly()
+./tests_chern.sng 1531. {
+./tests_chern.sng 1532.   string s="chernCharPoly()";
+./tests_chern.sng 1534.   ring h=0, (r, ch(1..5), t), ds;
+./tests_chern.sng 1536.   list l=ch(1..5);
+./tests_chern.sng 1538.   // get the polynomial r + ch(1)*t + ch(2)*t^2 + ... + ch(5)*t^5
+./tests_chern.sng 1540.   poly rez= chernCharPoly(r, l, t);
+./tests_chern.sng 1542.   ensure(rez==r+ch(1)*t+ch(2)*t^2+ch(3)*t^3+ch(4)*t^4+ch(5)*t^5);
+./tests_chern.sng 1544.   return(check(s));
+./tests_chern.sng 1546. }
+./tests_chern.sng 1547> 
+./tests_chern.sng 1548. proc test_toddPoly()
+./tests_chern.sng 1549. {
+./tests_chern.sng 1550.   string s="toddPoly()";
+./tests_chern.sng 1552.   ring r=0, (td(1..5), c(1..5), t), ds;
+./tests_chern.sng 1554.   list l=td(1..5);
+./tests_chern.sng 1556.   // get the polynomial 1 + td(1)*t + td(2)*t^2 + ... + td(5)*t^5
+./tests_chern.sng 1558.   poly rez= toddPoly(l, t);
+./tests_chern.sng 1560.   ensure(rez==1+td(1)*t+td(2)*t^2+td(3)*t^3+td(4)*t^4+td(5)*t^5);
+./tests_chern.sng 1562.   return(check(s));
+./tests_chern.sng 1564. }
+./tests_chern.sng 1565> 
+./tests_chern.sng 1566. proc test_rHRR()
+./tests_chern.sng 1567. {
+./tests_chern.sng 1568.   string s="rHRR()";
+./tests_chern.sng 1570.   ring r=0, (td(0..3), ch(0..3)), dp;
+./tests_chern.sng 1572.   // Let ch(0), ch(1), ch(2), ch(3) be the terms of the Chern character
+./tests_chern.sng 1574.   // of a vector bundle E on a 3-fold X.
+./tests_chern.sng 1576.   list c = ch(0..3);
+./tests_chern.sng 1578.   // Let td(0), td(1), td(2), td(3) be the terms of the Todd class of X.
+./tests_chern.sng 1580.   list t = td(0..3);
+./tests_chern.sng 1582.   // Then the highest term of the product ch(E).td(X) is:
+./tests_chern.sng 1584.   poly rez= rHRR(3, c, t);
+./tests_chern.sng 1586.   ensure(rez==td(3)*ch(0)+td(2)*ch(1)+td(1)*ch(2)+td(0)*ch(3));
+./tests_chern.sng 1588.   return(check(s));
+./tests_chern.sng 1590. }
+./tests_chern.sng 1591> 
+./tests_chern.sng 1592. proc test_SchurS()
+./tests_chern.sng 1593. {
+./tests_chern.sng 1594.   string s="SchurS()";
+./tests_chern.sng 1596.   // The Schur polynomial corresponding to the partition 1,2,4
+./tests_chern.sng 1598.   // and the Segre classes 1, s(1), s(2),..., s(6)
+./tests_chern.sng 1600.   ring r=0,(s(1..6)), dp;
+./tests_chern.sng 1602.   list I=1,2,4;
+./tests_chern.sng 1604.   list S=s(1..6);
+./tests_chern.sng 1606.   poly rez=SchurS(I, S);
+./tests_chern.sng 1608.   ensure(rez==s(1)*s(2)*s(4)-s(1)^2*s(5)-s(3)*s(4)+s(1)*s(6));
+./tests_chern.sng 1610.   // compare this with the Schur polynomial computed using Chern classes
+./tests_chern.sng 1612.   list C=chDual(chern(S));
+./tests_chern.sng 1614.   rez= SchurCh(I, C) ;
+./tests_chern.sng 1616.   ensure(rez==s(1)*s(2)*s(4)-s(1)^2*s(5)-s(3)*s(4)+s(1)*s(6));
+./tests_chern.sng 1618.   return(check(s));
+./tests_chern.sng 1620. }
+./tests_chern.sng 1621> 
+./tests_chern.sng 1622. proc test_SchurCh()
+./tests_chern.sng 1623. {
+./tests_chern.sng 1624.   string s="SchurCh()";
+./tests_chern.sng 1626.   // The Schur polynomial corresponding to the partition 1,2,4
+./tests_chern.sng 1628.   // and the Chern classes c(1), c(2), c(3)
+./tests_chern.sng 1630.   ring r=0,(c(1..3)), dp;
+./tests_chern.sng 1632.   list I=1,2,4;
+./tests_chern.sng 1634.   list C=c(1..3);
+./tests_chern.sng 1636.   poly rez= SchurCh(I, C);
+./tests_chern.sng 1638.   ensure(rez==c(1)^2*c(2)*c(3)-c(2)^2*c(3)-c(1)*c(3)^2);
+./tests_chern.sng 1640.   // Compare this with the Schur polynomial computed using Segre classes
+./tests_chern.sng 1642.   list S=segre( chDual( list(c(1..3)) ), 6 );
+./tests_chern.sng 1644.   rez=SchurS(I,S);
+./tests_chern.sng 1646.   ensure(rez==  c(1)^2*c(2)*c(3)-c(2)^2*c(3)-c(1)*c(3)^2);
+./tests_chern.sng 1648.   return(check(s));
+./tests_chern.sng 1650. }
+./tests_chern.sng 1651> 
+./tests_chern.sng 1652. proc test_part()
+./tests_chern.sng 1653. {
+./tests_chern.sng 1654.   string s="part()";
+./tests_chern.sng 1656.   // partitions into 3 summands of numbers not exceeding 1
+./tests_chern.sng 1658.   list rez= part(3, 1);
+./tests_chern.sng 1660.   ensure(rez[1][1]==      0);
+./tests_chern.sng 1662.   ensure(rez[1][2]==      0);
+./tests_chern.sng 1664.   ensure(rez[1][3]==      0);
+./tests_chern.sng 1666. 
+./tests_chern.sng 1668.   ensure(rez[2][1]==      0);
+./tests_chern.sng 1670.   ensure(rez[2][2]==      0);
+./tests_chern.sng 1672.   ensure(rez[2][3]==      1);
+./tests_chern.sng 1674. 
+./tests_chern.sng 1676.   ensure(rez[3][1]==      0);
+./tests_chern.sng 1678.   ensure(rez[3][2]==      1);
+./tests_chern.sng 1680.   ensure(rez[3][3]==      1);
+./tests_chern.sng 1682. 
+./tests_chern.sng 1684.   ensure(rez[4][1]==      1);
+./tests_chern.sng 1686.   ensure(rez[4][2]==      1);
+./tests_chern.sng 1688.   ensure(rez[4][3]==      1);
+./tests_chern.sng 1690. 
+./tests_chern.sng 1692.   return(check(s));
+./tests_chern.sng 1694. }
+./tests_chern.sng 1695> 
+./tests_chern.sng 1696. 
+./tests_chern.sng 1697. 
+./tests_chern.sng 1698. proc test_dualPart()
+./tests_chern.sng 1699. {
+./tests_chern.sng 1700.   string s="dualPart()";
+./tests_chern.sng 1702.   // dual partition to (1, 3, 4):
+./tests_chern.sng 1704.   list I = 1, 3, 4;
+./tests_chern.sng 1706.   list rez= dualPart(I);
+./tests_chern.sng 1708.   ensure(rez[1]==   1);
+./tests_chern.sng 1710.   ensure(rez[2]==   2);
+./tests_chern.sng 1712.   ensure(rez[3]==   2);
+./tests_chern.sng 1714.   ensure(rez[4]==   3);
+./tests_chern.sng 1716.   return(check(s));
+./tests_chern.sng 1718. }
+./tests_chern.sng 1719> 
+./tests_chern.sng 1720. proc test_PartC()
+./tests_chern.sng 1721. {
+./tests_chern.sng 1722.   string s="PartC()";
+./tests_chern.sng 1724.   // Complement of the partition (1, 3, 4) with respect to 5
+./tests_chern.sng 1726.   list I = 1, 3, 4;
+./tests_chern.sng 1728.   list rez= PartC(I, 5);
+./tests_chern.sng 1730.   ensure(rez[1]==  1);
+./tests_chern.sng 1732.   ensure(rez[2]==   2);
+./tests_chern.sng 1734.   ensure(rez[3]==   4);
+./tests_chern.sng 1736.   return(check(s));
+./tests_chern.sng 1738. }
+./tests_chern.sng 1739> 
+./tests_chern.sng 1740. proc test_partOver()
+./tests_chern.sng 1741. {
+./tests_chern.sng 1742.   string s="partOver()";
+./tests_chern.sng 1744.   // Partitions over the partition (3, 3, 4) with summands not exceeding 4
+./tests_chern.sng 1746.   list I = 3, 3, 4;
+./tests_chern.sng 1748.   list rez= partOver(4, I);
+./tests_chern.sng 1750.   ensure(rez[1][1] == 3);
+./tests_chern.sng 1752.   ensure(rez[1][2] == 3);
+./tests_chern.sng 1754.   ensure(rez[1][3] == 4);
+./tests_chern.sng 1756. 
+./tests_chern.sng 1758.   ensure(rez[2][1] == 3);
+./tests_chern.sng 1760.   ensure(rez[2][2] == 4);
+./tests_chern.sng 1762.   ensure(rez[2][3] == 4);
+./tests_chern.sng 1764. 
+./tests_chern.sng 1766.   ensure(rez[3][1] == 4);
+./tests_chern.sng 1768.   ensure(rez[3][2] == 4);
+./tests_chern.sng 1770.   ensure(rez[3][3] == 4);
+./tests_chern.sng 1772.   return(check(s));
+./tests_chern.sng 1774. }
+./tests_chern.sng 1775> 
+./tests_chern.sng 1776. 
+./tests_chern.sng 1777. proc test_partUnder()
+./tests_chern.sng 1778. {
+./tests_chern.sng 1779.   string s="partUnder()";
+./tests_chern.sng 1781.   // Partitions under the partition (0, 1, 1)
+./tests_chern.sng 1783.   list I = 0, 1, 1;
+./tests_chern.sng 1785.   list rez= partUnder(I);
+./tests_chern.sng 1787.   ensure(rez[1][1] == 0);
+./tests_chern.sng 1789.   ensure(rez[1][2] == 0);
+./tests_chern.sng 1791.   ensure(rez[1][3] == 0);
+./tests_chern.sng 1793. 
+./tests_chern.sng 1795.   ensure(rez[2][1] == 0);
+./tests_chern.sng 1797.   ensure(rez[2][2] == 0);
+./tests_chern.sng 1799.   ensure(rez[2][3] == 1);
+./tests_chern.sng 1801. 
+./tests_chern.sng 1803.   ensure(rez[3][1] == 0);
+./tests_chern.sng 1805.   ensure(rez[3][2] == 1);
+./tests_chern.sng 1807.   ensure(rez[3][3] == 1);
+./tests_chern.sng 1809.   return(check(s));
+./tests_chern.sng 1811. }
+./tests_chern.sng 1812> 
+./tests_chern.sng 1813. proc test_SegreA()
+./tests_chern.sng 1814. {
+./tests_chern.sng 1815.   string s="SegreA()";
+./tests_chern.sng 1817.   // Consider a 3-dimensional projective space
+./tests_chern.sng 1819.   ring r = 0, (x, y, z, w), dp;
+./tests_chern.sng 1821.   // Consider 3 non-coplanar lines trough one point and compute the Segre class
+./tests_chern.sng 1823.   ideal I=xy, xz, yz;
+./tests_chern.sng 1825.   list rez=SegreA(I);
+./tests_chern.sng 1827.   ensure(rez[1]==   0);
+./tests_chern.sng 1829.   ensure(rez[2]==   0);
+./tests_chern.sng 1831.   ensure(rez[3]==   3);
+./tests_chern.sng 1833.   ensure(rez[4]==   -10);
+./tests_chern.sng 1835.   // Now consider 3 coplanar lines trough one point and its Segre class
+./tests_chern.sng 1837.   ideal J=w, x*y*(x+y);
+./tests_chern.sng 1839.   rez=SegreA(J);
+./tests_chern.sng 1841.   ensure(rez[1]==   0);
+./tests_chern.sng 1843.   ensure(rez[2]==   0);
+./tests_chern.sng 1845.   ensure(rez[3]==   3);
+./tests_chern.sng 1847.   ensure(rez[4]==   -12);
+./tests_chern.sng 1849.   return(check(s));
+./tests_chern.sng 1851. }
+./tests_chern.sng 1852> 
+./tests_chern.sng 1853. proc test_FultonA()
+./tests_chern.sng 1854. {
+./tests_chern.sng 1855.   string s="FultonA()";
+./tests_chern.sng 1857.   // Consider a 3-dimensional projective space
+./tests_chern.sng 1859.   ring r = 0, (x, y, z, w), dp;
+./tests_chern.sng 1861.   // Consider 3 non-coplanar lines trough one point and compute the Fulton class
+./tests_chern.sng 1863.   ideal I=xy, xz, yz;
+./tests_chern.sng 1865.   list rez=FultonA(I);
+./tests_chern.sng 1867.   ensure(rez[1]==   0);
+./tests_chern.sng 1869.   ensure(rez[2]==   0);
+./tests_chern.sng 1871.   ensure(rez[3]==   3);
+./tests_chern.sng 1873.   ensure(rez[4]==   2);
+./tests_chern.sng 1875.   // Now consider 3 coplanar lines trough one point and its Fulton class
+./tests_chern.sng 1877.   ideal J=w, x*y*(x+y);
+./tests_chern.sng 1879.   rez=FultonA(J);
+./tests_chern.sng 1881.   ensure(rez[1]==   0);
+./tests_chern.sng 1883.   ensure(rez[2]==   0);
+./tests_chern.sng 1885.   ensure(rez[3]==   3);
+./tests_chern.sng 1887.   ensure(rez[4]==   0);
+./tests_chern.sng 1889.   return(check(s));
+./tests_chern.sng 1891. }
+./tests_chern.sng 1892> 
+./tests_chern.sng 1893. 
+./tests_chern.sng 1894. proc test_CSMA()
+./tests_chern.sng 1895. {
+./tests_chern.sng 1896.   string s="CSMA()";
+./tests_chern.sng 1898.   // consider the projective plane with homogeneous coordinates x, y, z
+./tests_chern.sng 1900.   ring r = 0, (x, y, z), dp;
+./tests_chern.sng 1902.   // the Chern-Schwartz-MacPherson class of a smooth cubic:
+./tests_chern.sng 1904.   ideal I=x3+y3+z3;
+./tests_chern.sng 1906.   list rez=CSMA(I);
+./tests_chern.sng 1908.   ensure(rez[1]==   0);
+./tests_chern.sng 1910.   ensure(rez[2]==   3);
+./tests_chern.sng 1912.   ensure(rez[3]==   0);
+./tests_chern.sng 1914.   // the Chern-Schwartz-MacPherson class of singular cubic
+./tests_chern.sng 1916.   // that is a union of 3 non-collinear lines:
+./tests_chern.sng 1918.   ideal J=x*y*z;
+./tests_chern.sng 1920.   rez= CSMA(J);
+./tests_chern.sng 1922.   ensure(rez[1]==   0);
+./tests_chern.sng 1924.   ensure(rez[2]==   3);
+./tests_chern.sng 1926.   ensure(rez[3]==   3);
+./tests_chern.sng 1928.   // the Chern-Schwartz-MacPherson class of singular cubic
+./tests_chern.sng 1930.   // that is a union of 3 lines passing through one point
+./tests_chern.sng 1932.   ideal K=x*y*(x+y);
+./tests_chern.sng 1934.   rez=CSMA(K);
+./tests_chern.sng 1936.   ensure(rez[1]==   0);
+./tests_chern.sng 1938.   ensure(rez[2]==   3);
+./tests_chern.sng 1940.   ensure(rez[3]==   4);
+./tests_chern.sng 1942.   return(check(s));
+./tests_chern.sng 1944. }
+./tests_chern.sng 1945> 
+./tests_chern.sng 1946. proc test_EulerAff()
+./tests_chern.sng 1947. {
+./tests_chern.sng 1948.   string s="EulerAff()";
+./tests_chern.sng 1950.   ring r = 0, (x, y), dp;
+./tests_chern.sng 1952.   // compute the Euler characteristic of the affine ellipric curve y^2=x^3+x+1;
+./tests_chern.sng 1954.   ideal I=y2-x3-x-1;
+./tests_chern.sng 1956.   ensure(EulerAff(I)==-1);
+./tests_chern.sng 1958.   return(check(s));
+./tests_chern.sng 1960. }
+./tests_chern.sng 1961> 
+./tests_chern.sng 1962. proc test_EulerAffBugFix()
+./tests_chern.sng 1963. {
+./tests_chern.sng 1964.   string s="EulerAffBugFix()";
+./tests_chern.sng 1966.   ring r = 0, (a, b, c, d), dp;
+./tests_chern.sng 1968.   // compute the Euler characteristic of the affine ellipric curve a3+b3+c3+d3+2*b*d=0;
+./tests_chern.sng 1970.   ideal I=a3+b3+c3+d3+2*b*d;
+./tests_chern.sng 1972.   ensure(EulerAff(I)==-11);
+./tests_chern.sng 1974.   return(check(s));
+./tests_chern.sng 1976. }
+./tests_chern.sng 1977> 
+./tests_chern.sng 1978. 
+./tests_chern.sng 1979. proc test_EulerProj()
+./tests_chern.sng 1980. {
+./tests_chern.sng 1981.   string s="EulerProj()";
+./tests_chern.sng 1983.   // consider the projective plane with homogeneous coordinates x, y, z
+./tests_chern.sng 1985.   ring r = 0, (x, y, z), dp;
+./tests_chern.sng 1987.   // Euler characteristic of a smooth cubic:
+./tests_chern.sng 1989.   ideal I=x3+y3+z3;
+./tests_chern.sng 1991.   ensure(EulerProj(I)==0);
+./tests_chern.sng 1993.   // Euler characteritic of 3 non-collinear lines:
+./tests_chern.sng 1995.   ideal J=x*y*z;
+./tests_chern.sng 1997.   ensure(EulerProj(J)==3);
+./tests_chern.sng 1999.   // Euler characteristic of 3 lines passing through one point
+./tests_chern.sng 2001.   ideal K=x*y*(x+y);
+./tests_chern.sng 2003.   ensure(EulerProj(K)==4);
+./tests_chern.sng 2005.   return(check(s));
+./tests_chern.sng 2007. }
+./tests_chern.sng 2008> 
+./tests_chern.sng 2009. proc test_full()
+./tests_chern.sng 2010. {
+./tests_chern.sng 2011. return(
+./tests_chern.sng 2013. test_symm()*
+./tests_chern.sng 2015. test_symNsym()*
+./tests_chern.sng 2017. test_CompleteHomog()*
+./tests_chern.sng 2019. test_segre()*
+./tests_chern.sng 2021. test_chern()*
+./tests_chern.sng 2023. test_chNum()*
+./tests_chern.sng 2025. test_chNumbers()*
+./tests_chern.sng 2027. test_sum_of_powers()*
+./tests_chern.sng 2029. test_powSumSym()*
+./tests_chern.sng 2031. test_chAll()*
+./tests_chern.sng 2033. test_chAllInv()*
+./tests_chern.sng 2035. test_chHE()*
+./tests_chern.sng 2037. test_ChernRootsSum()*
+./tests_chern.sng 2039. test_chSum()*
+./tests_chern.sng 2041. test_ChernRootsDual()*
+./tests_chern.sng 2043. test_chDual()*
+./tests_chern.sng 2045. test_ChernRootsProd()*
+./tests_chern.sng 2047. test_chProd()*
+./tests_chern.sng 2049. test_chProdE()*
+./tests_chern.sng 2051. test_chProdL()*
+./tests_chern.sng 2053. test_chProdLP()*
+./tests_chern.sng 2055. test_chProdM()*
+./tests_chern.sng 2057. test_chProdMP()*
+./tests_chern.sng 2059. test_ChernRootsHom()*
+./tests_chern.sng 2061. test_chHom()*
+./tests_chern.sng 2063. test_ChernRootsSymm()*
+./tests_chern.sng 2065. test_ChernRootsWedge()*
+./tests_chern.sng 2067. test_chSymm()*
+./tests_chern.sng 2069. test_chSymm2L()*
+./tests_chern.sng 2071. test_chSymm2LP()*
+./tests_chern.sng 2073. test_chWedge()*
+./tests_chern.sng 2075. test_chWedge2L()*
+./tests_chern.sng 2077. test_chWedge2LP()*
+./tests_chern.sng 2079. test_todd()*
+./tests_chern.sng 2081. test_toddE()*
+./tests_chern.sng 2083. test_Bern()*
+./tests_chern.sng 2085. test_tdCf()*
+./tests_chern.sng 2087. test_tdTerms()*
+./tests_chern.sng 2089. test_tdFactor()*
+./tests_chern.sng 2091. test_cProj()*
+./tests_chern.sng 2093. test_chProj()*
+./tests_chern.sng 2095. test_tdProj()*
+./tests_chern.sng 2097. test_eulerChProj()*
+./tests_chern.sng 2099. test_chNumbersProj()*
+./tests_chern.sng 2101. test_classpoly()*
+./tests_chern.sng 2103. test_chernPoly()*
+./tests_chern.sng 2105. test_chernCharPoly()*
+./tests_chern.sng 2107. test_toddPoly()*
+./tests_chern.sng 2109. test_rHRR()*
+./tests_chern.sng 2111. test_SchurS()*
+./tests_chern.sng 2113. test_SchurCh()*
+./tests_chern.sng 2115. test_part()*
+./tests_chern.sng 2117. test_dualPart()*
+./tests_chern.sng 2119. test_PartC()*
+./tests_chern.sng 2121. test_partOver()*
+./tests_chern.sng 2123. test_partUnder()*
+./tests_chern.sng 2125. test_SegreA()*
+./tests_chern.sng 2127. test_FultonA()*
+./tests_chern.sng 2129. test_CSMA()*
+./tests_chern.sng 2131. test_EulerAff()*
+./tests_chern.sng 2133. test_EulerAffBugFix()*
+./tests_chern.sng 2135. test_EulerProj()
+./tests_chern.sng 2137. );
+./tests_chern.sng 2139. }
+./tests_chern.sng 2140> test_full();
+1
+./tests_chern.sng 2141> $
+
+$Bye.
