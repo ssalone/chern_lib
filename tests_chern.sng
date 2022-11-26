@@ -77,6 +77,20 @@ proc test_symNsym()
   return(check(s));
 }
 
+proc test_symNsymBugFix()
+{
+  string s="symNsymBugFix()";
+  ring R0=0,(z,y,x,s1,s2,s3),lp;
+  list ls=s1,s2,s3;
+  poly q0=(x^2+2)*(y^2+2)*(z^2+2)-x*(y^2+2)*(z^2+2)-(x^2+2)*y*(z^2+2)-(z^2+2)*(y^2+2)*z;
+
+  list result = symNsym(q0,ls);   // this gives the following error
+  ensure(result[1] == 2*s1^2*s3-s1*s2^2+s3^2+8);
+  ensure(result[2] == z^3*x^2-2*z^3+z^2*y^3+2*z^2*y^2-2*z^2*y+z^2*x^3+2*z^2*x^2-2*z^2*x+4*z^2+z*y^2*x^2-2*z*y^2-4*z+y^3*x^2+y^2*x^3+2*y^2*x^2-2*y^2*x+4*y^2-2*y*x^2-4*y+4*x^2-4*x);
+  return(check(s));
+}
+
+
 proc test_CompleteHomog()
 {
   string s= "CompleteHomog()";
@@ -1144,6 +1158,7 @@ proc test_full()
 return(
 test_symm()*
 test_symNsym()*
+test_symNsymBugFix()*
 test_CompleteHomog()*
 test_segre()*
 test_chern()*
@@ -1211,6 +1226,7 @@ $
 
 test_symm();
 test_symNsym();
+test_symNsymBugFix();
 test_CompleteHomog();
 test_segre();
 test_chern();
