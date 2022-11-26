@@ -215,6 +215,10 @@ NOTE:     constants are considered symmetric
   list l=symm(list(A@(1..nV) )); // symmetric functions in A@(i)
   intvec v=leadexp(f), 0; // the exponent of the leading monomial
   int exponent;
+  // We proceed as if the initial polynomial were symmetric.
+  // Under this assumption the leading monomial will always be of the form
+  // A@(1)^n1 * A@(2)^n2 * ... * A@(nV)^nnV, n1 >= n2 >= ... >= nnV.
+  // Everything which contradicts this assumption is considered as a part of the remainder.
   while(v[N1]!=0)
   {
     mon=leadcoef(f); // leading coefficient of f
@@ -222,23 +226,23 @@ NOTE:     constants are considered symmetric
     for(i=1; i<=nV && mon !=0 ;i++ )
     {
       exponent = v[N1+i-1]-v[N1+i];
-      if( exponent >=0 )
+      if( exponent >=0 ) // symmetric case
       {
         mon = mon*c@(i)^exponent;
         monc = monc*l[i]^exponent; // has the same leading coefficient as f
       }
-      else
+      else // not the symmetric case
       {
         mon=0;
         monc=0;
       }
     }
-    if(mon==0)
+    if(mon==0) // not the symmetric case
     {
       rez2=rez2+lead(f);
       f=f-lead(f);
     }
-    else
+    else // symmetric case
     {
       rez1=rez1+mon; // add a monomial
       f=f-monc; // subtract the monomial
