@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////
-version = "version chern.lib 0.7061 Jun_2018 ";      //$Id$
+version = "version chern.lib 0.7062 Nov_2022 ";      //$Id$
 category = "Chern classes";
 info="
 LIBRARY:  chern.lib    Symbolic Computations with Chern classes,
@@ -176,7 +176,7 @@ PURPOSE:  computes a symmetric and a non-symmetric part of f
           in terms of the elementary symmetric functions from c
           as well a non-symmetric remainder
 EXAMPLE:  example symNsym; shows an example
-NOTE:     constants are not considered symmetric
+NOTE:     constants are considered symmetric
 "
 {
   ideal V=variables(f); // variables f depends on
@@ -209,13 +209,29 @@ NOTE:     constants are not considered symmetric
   {
     mon=leadcoef(f); // leading coefficient of f
     monc=mon;
-    for(i=1; v[N1+i-1]!=0 ;i++ )
+    for(i=1; i<=nV && mon !=0 ;i++ )
     {
-      mon = mon*c@(i)^( v[N1+i-1]-v[N1+i] );
-      monc = monc*l[i]^( v[N1+i-1]-v[N1+i] ); // has the same leading coefficient as f
+      if( v[N1+i-1]-v[N1+i] >=0 )
+      {
+        mon = mon*c@(i)^( v[N1+i-1]-v[N1+i] );
+        monc = monc*l[i]^( v[N1+i-1]-v[N1+i] ); // has the same leading coefficient as f
+      }
+      else
+      {
+        mon=0;
+        monc=0;
+      }
     }
-    rez1=rez1+mon; // add a monomial
-    f=f-monc; // subtract the monomial
+    if(mon==0)
+    {
+      rez2=rez2+lead(f);
+      f=f-lead(f);
+    }
+    else
+    {
+      rez1=rez1+mon; // add a monomial
+      f=f-monc; // subtract the monomial
+    }
     v=leadexp(f), 0;
   }
   while( leadexp(f)!=0 )
