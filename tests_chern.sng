@@ -90,6 +90,29 @@ proc test_symNsymBugFix()
   return(check(s));
 }
 
+proc test_symNsymRandomData()
+{
+  string s="symNsymRandomData()";
+  ring R0=0,(z,y,x,s1,s2,s3),lp;
+  list ls=s1,s2,s3;
+
+  int i;
+  poly randomPoly;
+  ideal I = x,y,z;
+  list S= symm(list(x, y, z));
+  I=I,I^2, I^3, I^4;
+  list result;
+  for(i=1;i<=100;i++)
+  {
+    randomPoly = (I*random(40, 34, 1))[1,1];
+    result = symNsym(randomPoly, ls);
+
+    ensure(subst(result[1], s1, S[1], s2, S[2], s3, S[3])+result[2] == randomPoly);
+    ensure(symNsym(subst(result[1], s1, S[1], s2, S[2], s3, S[3]), ls)[1] == result[1]);
+  }
+  return(check(s));
+}
+
 
 proc test_CompleteHomog()
 {
@@ -1159,6 +1182,7 @@ return(
 test_symm()*
 test_symNsym()*
 test_symNsymBugFix()*
+test_symNsymRandomData()*
 test_CompleteHomog()*
 test_segre()*
 test_chern()*
@@ -1227,6 +1251,7 @@ $
 test_symm();
 test_symNsym();
 test_symNsymBugFix();
+test_symNsymRandomData()
 test_CompleteHomog();
 test_segre();
 test_chern();
